@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -11,6 +12,25 @@ import check_lua_syntax
 
 
 class ValidateModTests(unittest.TestCase):
+    def test_project_identity_metadata_is_not_inherited_from_upstream(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        document = ET.parse(root / "modDesc.xml")
+        mod_desc = document.getroot()
+
+        self.assertEqual(
+            mod_desc.findtext("author"),
+            "FS25 Realistic Livestock Enhanced contributors",
+        )
+        self.assertEqual(mod_desc.findtext("version"), "1.0.0.0")
+        self.assertEqual(
+            mod_desc.findtext("title/en"),
+            "Realistic Livestock Enhanced",
+        )
+        self.assertEqual(
+            mod_desc.findtext("iconFilename"),
+            "icon_RealisticLivestock.dds",
+        )
+
     def test_normalises_only_giants_lua_extensions(self) -> None:
         source = "if ready then continue end\nlocal value = (number)::number\n"
         self.assertEqual(check_lua_syntax.standard_lua_source(source), "if ready then  end\nlocal value = (number)\n")
