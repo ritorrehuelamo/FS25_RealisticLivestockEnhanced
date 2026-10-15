@@ -21,6 +21,7 @@ RUNTIME_DIRECTORIES = (
     "xml",
 )
 ROOT_FILES = ("CHANGELOG.md", "LICENSE", "README.md", "icon_RealisticLivestock.dds", "modDesc.xml")
+ARCHIVE_FILENAME = "FS25_RealisticLivestockEnhanced.zip"
 PUBLIC_VERSION = re.compile(r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?P<suffix>-rc\.(?P<rc>[1-9]\d*))?$")
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 
@@ -123,8 +124,7 @@ def main() -> None:
 
     source = args.source.resolve()
     output_dir = args.output_dir.resolve()
-    filename = f"FS25_RealisticLivestockEnhanced_{technical_version(args.version)}.zip"
-    archive = output_dir / filename
+    archive = output_dir / ARCHIVE_FILENAME
 
     write_archive(source, archive, args.version)
     validate_archive(archive, args.version)
