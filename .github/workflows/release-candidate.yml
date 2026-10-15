@@ -1,0 +1,80 @@
+name: Publish release candidate
+
+on:
+  pull_request:
+    branches: [main]
+    types: [labeled, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-candidate-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      contains(github.event.pull_request.labels.*.name, 'release') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run release-version unit tests
+        run: python -m unittest discover -s tools/tests -v
+      - name: Find the latest stable release tag
+        id: stable
+        run: |
+          tag=$(git tag --list 'v*' --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Calculate release version
+        id: version
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+          LATEST_STABLE_TAG: ${{ steps.stable.outputs.tag }}
+        run: python tools/release_version.py --require-description --github-output "$GITHUB_OUTPUT"
+      - name: Calculate release-candidate sequence
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[].tag_name' > release-tags.txt
+          sequence=$(python -c "import os,re; tags=open('release-tags.txt', encoding='utf-8').read().splitlines(); pattern=re.compile(r'^v'+re.escape(os.environ['VERSION'])+r'-rc\.(\d+)$'); print(max((int(m.group(1)) for tag in tags if (m:=pattern.fullmatch(tag))), default=0)+1)")
+          echo "tag=v${VERSION}-rc.${sequence}" >> "$GITHUB_OUTPUT"
+      - name: Build and validate mod archive
+        env:
+          VERSION: ${{ steps.candidate.outputs.tag }}
+        run: python tools/build_mod.py --version "${VERSION#v}"
+      - name: Render release notes from PR metadata
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+        run: >-
+          python tools/release_notes.py
+          --version "${{ steps.candidate.outputs.tag }}"
+          --stage candidate
+          --pr-number "${{ github.event.pull_request.number }}"
+          --pr-url "${{ github.event.pull_request.html_url }}"
+          --output release-notes.md
+      - name: Create archive checksum
+        run: sha256sum dist/*.zip > dist/SHA256SUMS.txt
+      - name: Publish pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.candidate.outputs.tag }}
+          TARGET: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: >-
+          gh release create "$TAG" dist/*.zip dist/SHA256SUMS.txt
+          --target "$TARGET"
+          --title "$TAG — $PR_TITLE"
+          --notes-file release-notes.md
+          --prerelease

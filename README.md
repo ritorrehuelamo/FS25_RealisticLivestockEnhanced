@@ -26,6 +26,17 @@ Each milestone is a separately releasable module. Work starts only after its des
 | `1.6.0` | Livestock economics | Individual costs and income, margins, and a clear distinction between recorded game costs and optional economic estimates. |
 | `1.7.0` | Management interface and automation | Pedigree views, management dashboards, alerts, and Herdsman extensions built on the preceding modules. |
 
+## Release automation
+
+Releases are created only from pull requests into `main`; contributors never commit releases directly to `main`.
+
+- Use a Conventional Commit title. `feat:` creates the next minor version, `fix:` the next patch version, and `!` or a `BREAKING CHANGE:` footer creates the next major version.
+- A PR intended for release must use the `release` label and contain non-empty `## Summary` and `## Validation` sections. Its title and description are reused as the GitHub release title and notes.
+- While that PR is open, each eligible update creates a tested GitHub pre-release named `vX.Y.Z-rc.N`.
+- Once the labelled PR is merged into `main`, the workflow creates the corresponding final `vX.Y.Z` release and its mod ZIP plus `SHA256SUMS.txt` checksum.
+
+The first stable release is `v1.0.0`; inherited upstream tags are deliberately not used to number this fork.
+
 ## First feature milestone: `1.1.0` — Pedigree and safe breeding
 
 The first module will preserve ancestry independently from whether an animal is still alive or owned, calculate known kinship, and apply a configurable breeding policy:
