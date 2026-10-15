@@ -15,8 +15,11 @@ local RECORD_VERSION = 1
 
 local function writeRecord(xmlFile, key, record)
     xmlFile:setString(key .. "#id", record.id)
-    xmlFile:setString(key .. "#motherId", record.motherId)
-    xmlFile:setString(key .. "#fatherId", record.fatherId)
+    -- Parent links are genuinely optional for animals that predate this
+    -- module. GIANTS XMLFile:setString rejects nil, so omit an unknown parent
+    -- instead of emitting a save-time script error for every such record.
+    if record.motherId ~= nil then xmlFile:setString(key .. "#motherId", record.motherId) end
+    if record.fatherId ~= nil then xmlFile:setString(key .. "#fatherId", record.fatherId) end
     if record.typeIndex ~= nil then xmlFile:setInt(key .. "#typeIndex", record.typeIndex) end
     xmlFile:setInt(key .. "#version", RECORD_VERSION)
 end
