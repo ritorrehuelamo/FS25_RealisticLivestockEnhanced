@@ -1,28 +1,27 @@
 <modDesc descVersion="114">
-    <author>Ritter</author>
-    <version>1.4.1.0-dev.3</version>
+    <author>FS25 Realistic Livestock Enhanced contributors</author>
+    <version>1.0.0</version>
     <title>
-        <en>Realistic Livestock - Ritter version</en>
-        <it>Allevamento Realistico - Versione Ritter</it>
+        <en>Realistic Livestock Enhanced</en>
+        <it>Realistic Livestock Enhanced</it>
     </title>
     <description>
         <en>
-            <![CDATA[Replaces FS25's simple animal clusters with individually tracked animals - each with unique genetics, breeding, diseases, and production traits. A maintained version of Arrow-kb's Realistic Livestock mod.
+            <![CDATA[Replaces FS25's simple animal clusters with individually tracked animals - each with unique genetics, breeding, diseases, and production traits. Realistic Livestock Enhanced is a GPL-3 fork of Arrow-kb's original Realistic Livestock mod.
 
 Every animal is tracked separately with its own identity, genetic makeup, health status, and production output. Genetics are inherited through breeding, diseases can spread and require treatment, and production is driven by each animal's individual traits. Everything is managed from the RL Menu - a dedicated tabbed interface for browsing, trading, moving, filtering, and automating your herds.
 
-This is a maintained version of the original Realistic Livestock mod by Arrow-kb, who has discontinued development. The goal is to keep the mod working, fix bugs, and make improvements where needed.
+This project continues the original mod's foundations with a focus on realistic livestock systems, compatibility, fixes, and new enhancements.
 
 Notes:
 - Based on Arrow-kb's Realistic Livestock mod (v1.2.0.5), released under GPL-3 license
 - Changes to the disease system are inspired by Renfordt's Enhanced Livestock (released under GPL-3 license), with some parts converted directly from it
 - Savegame data from Arrow-kb's original version is automatically migrated on first load
 - Font Library mod is no longer required
-- Incompatible with FS25_EnhancedLivestock, FS25_MoreVisualAnimals, and FS25_EnhancedAnimalSystem
+- Do not enable alongside FS25_RealisticLivestockRM, FS25_EnhancedLivestock, FS25_MoreVisualAnimals, or FS25_EnhancedAnimalSystem
 - Works on virtually any map; maps that add their own custom animals or breeds have built-in support (see docs)
 
-Documentation: https://rittermod.github.io/FS25_RealisticLivestockRM
-Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivestockRM
+Project, documentation and issue tracker: https://github.com/ritorrehuelamo/FS25_RealisticLivestockEnhanced
 
 Changelog:
 1.4.1.0-dev.3:
@@ -102,21 +101,20 @@ Documentation:
 ]]>
         </en>
         <it>
-            <![CDATA[Sostituisce i semplici cluster di animali di FS25 con animali individualmente tracciati, ciascuno con genetica unica, allevamento, malattie e tratti produttivi. Una versione mantenuta del mod Realistic Livestock di Arrow-kb.
+            <![CDATA[Sostituisce i semplici cluster di animali di FS25 con animali individualmente tracciati, ciascuno con genetica unica, allevamento, malattie e tratti produttivi. Realistic Livestock Enhanced è un fork GPL-3 del mod Realistic Livestock originale di Arrow-kb.
 
 Ogni animale viene monitorato separatamente con la propria identità, composizione genetica, stato di salute e produzione. La genetica si trasmette tramite riproduzione, le malattie possono diffondersi richiedendo trattamenti, e la produzione dipende dai tratti individuali di ciascun animale. Tutto si gestisce dal Menu RL - un'interfaccia a schede dedicata per consultare, commerciare, spostare, filtrare e automatizzare le tue mandrie.
 
-Questa è una versione mantenuta del mod originale Realistic Livestock di Arrow-kb, che ha interrotto lo sviluppo. L'obiettivo è mantenere il mod funzionante, correggere bug e apportare miglioramenti dove necessario.
+Il progetto continua le basi del mod originale con l'obiettivo di offrire sistemi zootecnici realistici, compatibilità, correzioni e nuovi miglioramenti.
 
 Note:
 - Basato sul mod Realistic Livestock di Arrow-kb (v1.2.0.5), rilasciato sotto licenza GPL-3
 - Le modifiche al sistema delle malattie sono ispirate a Enhanced Livestock di Renfordt (rilasciato sotto licenza GPL-3), con alcune parti convertite direttamente da esso
 - I dati di salvataggio della versione originale di Arrow-kb vengono migrati automaticamente al primo caricamento
 - Il mod Font Library non è più richiesto
-- Incompatibile con FS25_EnhancedLivestock, FS25_MoreVisualAnimals e FS25_EnhancedAnimalSystem
+- Non abilitare insieme a FS25_RealisticLivestockRM, FS25_EnhancedLivestock, FS25_MoreVisualAnimals o FS25_EnhancedAnimalSystem
 
-Documentazione: https://rittermod.github.io/FS25_RealisticLivestockRM
-Codice sorgente e tracciamento issue: https://github.com/rittermod/FS25_RealisticLivestockRM
+Progetto, documentazione e segnalazione problemi: https://github.com/ritorrehuelamo/FS25_RealisticLivestockEnhanced
 
 ]]>
         </it>

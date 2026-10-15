@@ -21,20 +21,18 @@ RUNTIME_DIRECTORIES = (
     "xml",
 )
 ROOT_FILES = ("CHANGELOG.md", "LICENSE", "README.md", "icon_RealisticLivestock.dds", "modDesc.xml")
+ARCHIVE_FILENAME = "FS25_RealisticLivestockEnhanced.zip"
 PUBLIC_VERSION = re.compile(r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?P<suffix>-rc\.(?P<rc>[1-9]\d*))?$")
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 
 
-def technical_version(public_version: str) -> str:
-    """Map a SemVer release name to the four-part FS modDesc version."""
+def mod_version(public_version: str) -> str:
+    """Validate and preserve the public release version in modDesc.xml."""
     match = PUBLIC_VERSION.fullmatch(public_version)
     if match is None:
         raise ValueError(f"invalid public version: {public_version!r}")
 
-    return (
-        f"{match.group('major')}.{match.group('minor')}.{match.group('patch')}.0"
-        f"{match.group('suffix') or ''}"
-    )
+    return public_version
 
 
 def validate_mod_desc(contents: bytes, expected_version: str | None = None) -> None:
@@ -87,7 +85,7 @@ def runtime_files(source: Path) -> list[Path]:
 
 
 def write_archive(source: Path, destination: Path, public_version: str) -> None:
-    game_version = technical_version(public_version)
+    game_version = mod_version(public_version)
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
@@ -104,7 +102,7 @@ def write_archive(source: Path, destination: Path, public_version: str) -> None:
 
 
 def validate_archive(path: Path, public_version: str) -> None:
-    expected_version = technical_version(public_version)
+    expected_version = mod_version(public_version)
     with zipfile.ZipFile(path) as archive:
         invalid = [name for name in archive.namelist() if name.startswith("/") or ".." in Path(name).parts]
         if invalid:
@@ -123,8 +121,7 @@ def main() -> None:
 
     source = args.source.resolve()
     output_dir = args.output_dir.resolve()
-    filename = f"FS25_RealisticLivestockEnhanced_{technical_version(args.version)}.zip"
-    archive = output_dir / filename
+    archive = output_dir / ARCHIVE_FILENAME
 
     write_archive(source, archive, args.version)
     validate_archive(archive, args.version)
