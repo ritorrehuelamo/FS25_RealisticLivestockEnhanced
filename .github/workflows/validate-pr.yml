@@ -40,3 +40,4 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body || '' }}
         run: >-
           python tools/release_version.py --validate-title --require-description
+          --require-manual-fs25-verification
