@@ -31,6 +31,16 @@ class ReleaseVersionTests(unittest.TestCase):
         self.assertTrue(release_version.release_description_is_valid("## Summary\n\nOne change.\n\n## Validation\n\nTests pass."))
         self.assertFalse(release_version.release_description_is_valid("## Summary\n\nOne change."))
 
+    def test_release_requires_checked_manual_fs25_verification(self) -> None:
+        body = """## Manual FS25 verification
+
+- [x] Clean test save loads the mod without errors.
+- [x] Save and reload preserve the affected data.
+- [x] A fresh log.txt has no new errors or stack traces from this mod.
+"""
+        self.assertTrue(release_version.manual_fs25_verification_is_valid(body))
+        self.assertFalse(release_version.manual_fs25_verification_is_valid(body.replace("- [x] Save", "- [ ] Save")))
+
 
 if __name__ == "__main__":
     unittest.main()

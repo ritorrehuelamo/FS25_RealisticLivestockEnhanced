@@ -39,7 +39,9 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body || '' }}
           LATEST_STABLE_TAG: ${{ steps.stable.outputs.tag }}
-        run: python tools/release_version.py --require-description --github-output "$GITHUB_OUTPUT"
+        run: >-
+          python tools/release_version.py --require-description
+          --require-manual-fs25-verification --github-output "$GITHUB_OUTPUT"
       - name: Calculate release-candidate sequence
         id: candidate
         env:

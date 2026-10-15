@@ -18,6 +18,16 @@ jobs:
           python-version: '3.12'
       - name: Run release-version unit tests
         run: python -m unittest discover -s tools/tests -v
+      - name: Validate mod metadata and source references
+        run: python tools/validate_mod.py
+      - name: Build and validate distributable mod archive
+        run: python tools/build_mod.py --version 1.0.0-rc.1 --output-dir dist/ci
+      - name: Install Lua test runtime
+        run: sudo apt-get update && sudo apt-get install --yes lua5.4
+      - name: Check Lua syntax
+        run: find scripts -name '*.lua' -print0 | xargs -0 -n1 luac5.4 -p
+      - name: Run Lua domain tests
+        run: lua5.4 tools/tests/lua/run.lua
       - name: Validate Conventional Commit title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -28,4 +38,6 @@ jobs:
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body || '' }}
-        run: python tools/release_version.py --validate-title --require-description
+        run: >-
+          python tools/release_version.py --validate-title --require-description
+          --require-manual-fs25-verification
