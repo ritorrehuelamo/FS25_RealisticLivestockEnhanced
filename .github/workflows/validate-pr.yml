@@ -24,8 +24,8 @@ jobs:
         run: python tools/build_mod.py --version 1.0.0-rc.1 --output-dir dist/ci
       - name: Install Lua test runtime
         run: sudo apt-get update && sudo apt-get install --yes lua5.4
-      - name: Check Lua syntax
-        run: find scripts -name '*.lua' -print0 | xargs -0 -n1 luac5.4 -p
+      - name: Check GIANTS Lua syntax
+        run: python tools/check_lua_syntax.py --luac luac5.4
       - name: Run Lua domain tests
         run: lua5.4 tools/tests/lua/run.lua
       - name: Validate Conventional Commit title

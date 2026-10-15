@@ -7,9 +7,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import validate_mod
+import check_lua_syntax
 
 
 class ValidateModTests(unittest.TestCase):
+    def test_normalises_only_giants_lua_extensions(self) -> None:
+        source = "if ready then continue end\nlocal value = (number)::number\n"
+        self.assertEqual(check_lua_syntax.standard_lua_source(source), "if ready then  end\nlocal value = (number)\n")
+
     def write_minimal_mod(self, root: Path, main_source: str = 'source(modDirectory .. "scripts/example.lua")') -> None:
         (root / "scripts").mkdir()
         (root / "modDesc.xml").write_text(
