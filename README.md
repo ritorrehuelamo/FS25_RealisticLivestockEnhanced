@@ -1,15 +1,42 @@
-[![Read User Guide](https://img.shields.io/badge/Read-User_Guide-blue?style=for-the-badge&logo=materialformkdocs&logoColor=white)](https://rittermod.github.io/FS25_RealisticLivestockRM/)
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest_Release-orange?style=for-the-badge&logo=github)](https://github.com/rittermod/FS25_RealisticLivestockRM/releases/latest/download/FS25_RealisticLivestockRM.zip)
+# FS25 Realistic Livestock Enhanced
 
-# FS25 Realistic Livestock - Ritter version
+FS25 Realistic Livestock Enhanced is a GPL-3.0 fork of Ritter's maintained version of [Realistic Livestock RM](https://github.com/rittermod/FS25_RealisticLivestockRM), itself based on Arrow-kb's original [Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock). It replaces FS25's simple animal clusters with individually tracked animals, each with their own genetics, reproduction, health, growth, and production state.
 
-Replaces FS25's simple animal clusters with individually tracked animals - each with unique genetics, breeding, diseases, and production traits. A maintained version of Arrow-kb's [Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod.
+The project evolves the existing, stable individual-animal simulation into a deeper livestock-management experience. Genetic selection, reproduction, nutrition, health, production, growth, and farm economics will be developed as connected systems, through small and testable releases.
 
-Every animal is tracked separately with its own identity, genetic makeup, health status, and production output. Genetics are inherited through breeding, diseases can spread and require treatment, and production is driven by each animal's individual traits. Everything is managed from the RL Menu - a dedicated tabbed interface for browsing, trading, moving, filtering, and automating your herds.
+## Documentation
 
-This is a maintained version of the original mod by Arrow-kb, who has discontinued development. The goal is to keep the mod working, fix bugs, and make improvements where needed. While less ambitious in scope than the original roadmap, this version focuses on stability and reliability.
+The included [user guide](docs/user-guide/index.md) documents the inherited baseline. Enhanced-specific documentation will be added alongside each approved milestone.
 
-**[User Documentation](https://rittermod.github.io/FS25_RealisticLivestockRM/)** - Guides and per-species factsheets covering genetics, breeding, diseases, production, and settings.
+> [!IMPORTANT]
+> The roadmap below describes planned work, not features already present in a release. The current source baseline is upstream `1.4.1.0-dev.3`; the first stable release of this fork will be `1.0.0`.
+
+## Project Roadmap
+
+Each milestone is a separately releasable module. Work starts only after its design, compatibility impact, migration path, and tests have been reviewed.
+
+| Planned version | Module | Scope |
+| --- | --- | --- |
+| `1.0.0` | Enhanced baseline | First stable release of the fork: GPL attribution, distinct project identity, documented compatibility boundaries, and validated packaging, loading, save/load, and rollback procedure. |
+| `1.1.0` | Pedigree and safe breeding | Persistent ancestry, kinship detection, configurable warnings and blocks for high-risk pairings, and Herdsman safeguards. |
+| `1.2.0` | Reproduction and genetic planning | Pairing plans, reproductive calendars, AI selection tools, and breeding-program indicators. |
+| `1.3.0` | Dairy production | Individual lactation state, production history, dry periods, and transparent production indicators. |
+| `1.4.0` | Nutrition and growth | Stage-specific requirements, feed-efficiency indicators, growth and finishing analysis, designed around existing feed mods. |
+| `1.5.0` | Animal health | Individual health histories, prevention and treatment workflows, and production or fertility consequences. |
+| `1.6.0` | Livestock economics | Individual costs and income, margins, and a clear distinction between recorded game costs and optional economic estimates. |
+| `1.7.0` | Management interface and automation | Pedigree views, management dashboards, alerts, and Herdsman extensions built on the preceding modules. |
+
+## First feature milestone: `1.1.0` — Pedigree and safe breeding
+
+The first module will preserve ancestry independently from whether an animal is still alive or owned, calculate known kinship, and apply a configurable breeding policy:
+
+- Block high-risk pairings by default: parent-offspring, siblings, and grandparent-offspring.
+- Warn and require confirmation for more distant known relationships.
+- Do not block a pairing solely because historical data is incomplete.
+- Apply the same policy to natural breeding, artificial insemination, and Herdsman automation.
+- Preserve compatibility with existing saves through a forward-only migration and isolated savegame tests.
+
+No game data or animal records are changed merely by documenting this milestone.
 
 ## Features
 
@@ -37,12 +64,12 @@ This is a maintained version of the original mod by Arrow-kb, who has discontinu
 - Simple support for butchers using Extended Production Point (EPP) mod
 - Mod compatibility checks at startup: hard-block dialog for incompatible mods, plus a dismissible warning tier for mods known to degrade gameplay
 - In-game warning when two map bridges or animal packs replace the same animal type's husbandry config (last-loaded wins; first one's animals can render as ghosts)
-- Mod compatibility bridges for foreign mods that overlap RLRM's hooks - currently coexists with Seasonal Wool Production (Argsy Gaming) without double wool output
+- Mod compatibility bridges for foreign mods that overlap the inherited baseline's hooks - currently coexists with Seasonal Wool Production (Argsy Gaming) without double wool output
 - Multiplayer support (server-authoritative)
 
 ## Supported Maps & Packs
 
-RLRM works on virtually any map out of the box. It does not need to be on a list. The maps below are special only because they add their own custom animal types or breeds, which need built-in support for those extras to get the full RLRM treatment (genetics, breeding, reproduction). On any other map, the standard animals just work.
+The Enhanced baseline works on virtually any map out of the box. It does not need to be on a list. The maps below are special only because they add their own custom animal types or breeds, which need built-in support for those extras to receive the full individual-animal treatment (genetics, breeding, reproduction). On any other map, the standard animals just work.
 
 **Maps:**
 - [Hof Bergmann](https://www.lsfarming-mods.com/) - ducks, geese, cats, rabbits, alpacas, quail with full breeding support
@@ -55,24 +82,25 @@ RLRM works on virtually any map out of the box. It does not need to be on a list
 
 ## Notes
 
-- Savegame data from Arrow-kb's original version is automatically migrated on first load
+- The inherited baseline includes migration from Arrow-kb's original version; its behaviour under the Enhanced identity has not yet been validated.
 - Font Library mod is no longer required (functionality has been inlined)
 - Incompatible with FS25_EnhancedLivestock, FS25_MoreVisualAnimals, and FS25_EnhancedAnimalSystem (use FS25_MoreVisualAnimalsRM instead of FS25_MoreVisualAnimals)
 
 ## Installation
 
-Place `FS25_RealisticLivestockRM.zip` in your mods folder.
+Release installation instructions will be published with the first Enhanced release. Until then, treat this repository as development source code; do not install it alongside `FS25_RealisticLivestockRM` in a production savegame.
 
-**Migrating from Arrow-kb's version:** Remove `FS25_RealisticLivestock.zip` and `FS25_FontLibrary.zip`. Back up your savegame first, then load it - data migrates automatically.
+**Migration:** Migration from Arrow-kb's or Rittermod's releases has not yet been validated for Enhanced. Do not load an existing production savegame until the `1.0.0` compatibility procedure has been published and tested on a copy.
 
 ## Changelog
 See the [CHANGELOG](CHANGELOG.md) for a detailed list of changes, fixes, and improvements in this version.
 
 ## Credits
 
-My version of the awesome [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod by [Arrow-kb](https://github.com/Arrow-kb) (v1.2.0.5), released under GPL-3 license.
-
-Changes to the disease system are inspired by Renfordt's [Enhanced Livestock](https://github.com/renfordt/FS25_EnhancedLivestock), also released under GPL-3 license, with some parts converted directly from it.
+- Original project: [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) by [Arrow-kb](https://github.com/Arrow-kb) (v1.2.0.5), released under GPL-3.0.
+- Maintained upstream: [FS25 Realistic Livestock RM](https://github.com/rittermod/FS25_RealisticLivestockRM) by Ritter, released under GPL-3.0.
+- This project: FS25 Realistic Livestock Enhanced, a fork of the maintained upstream version. Contributions and their authors are recorded in this repository's Git history.
+- The inherited disease-system changes are inspired by Renfordt's [Enhanced Livestock](https://github.com/renfordt/FS25_EnhancedLivestock), also released under GPL-3.0; some parts were converted directly from it.
 
 ## License
 This mod is released under GPL-3 license. See the [LICENSE](LICENSE) file for details.
@@ -80,25 +108,19 @@ This mod is released under GPL-3 license. See the [LICENSE](LICENSE) file for de
 
 
 
-# About reuse, modification and building upon the original Realistic Livestock mod by Arrow-kb
+# About reuse, modification and building upon FS25 Realistic Livestock Enhanced
 
 > [!NOTE]
-> TL;DR: The original Realistic Livestock mod by Arrow-kb is open source GPL-3 licensed. Anyone can freely use, modify, and redistribute it as long as they: give credit, keep the same GPL-3 license, and share their changes openly. No one can restrict reuse.
+> TL;DR: FS25 Realistic Livestock Enhanced is GPL-3.0 software based on GPL-3.0 projects. Anyone can use, modify, and redistribute it as long as they preserve the required notices, license the whole derivative work under GPL-3.0, and provide the corresponding source when distributing it.
 
 
 
-The original Realistic Livestock mod by Arrow-kb is released under GPL-3 license. This means that anyone are free to reuse and modify the mod (the work) as long as they comply with the terms of the GPL-3 license, which in short terms means, to the best of my understanding:
-- You are free to use, reuse, and modify the code/mod for any purpose.
-- You must provide attribution to the author(s) when you distribute reused/modified/built upon code.
-- You must release your own modified code/mod under the same GPL-3 license so others can build upon it too.
-- You must include a copy of the GPL-3 license with the mod.
+This fork is derived from the original Realistic Livestock project by Arrow-kb and the maintained Realistic Livestock RM project by Ritter. Those projects and this fork are released under GPL-3.0. In practical terms, when distributing this fork or a modified version:
 
-This means that **anyone can use, and build upon, any modification I make** in this Ritter version of the Realistic Livestock mod **without any prior consent** or similar **from me, as long as they too comply with the GPL-3 license terms**, attibute me for the changes I have made AND release their modified code/mod under the same GPL-3 license for any changes/additions they have made.
+- You may use, study, modify, and redistribute the code for any purpose.
+- Keep the applicable copyright, attribution, licence, and warranty notices.
+- Clearly state that you modified the work and give a relevant date.
+- License the complete derivative work under GPL-3.0 and include a copy of that licence.
+- Provide the corresponding source code, including the scripts needed to build, install, and modify the distributed version.
 
-It **also means** that **anyone, including me, can reuse and build opon any changes made by others** to the mod **without any prior consent** or similar **from the authors of those modifications** since their changes to the mod are also licensed under the same GPL-3.
-
-**Nobody can say, "No, this is my code, you can not reuse it".** The GPL-3 license ensures that the code/mod and any mod built on it will always remain free and open for anyone to use, modify, and distribute under the same GPL-3 license terms. There might at some point a discussion about when is a mod no longer a "mod built on the original mod" but that is way over my paygrade.
-
-And **remember**: Any vioation of this might not be intentional or malicious. People might simply not understand the implications of what they agreed to when they started building upon the mod with this license.
-
-(I am not a OSS licensing lawyer, but most likeley neither are you. This is my understanding of the GPL-3 license as it applies to this mod. If you have **QUALIFIED** legal knowledge, and not armchair legal knowledge, that contradicts what I say here, please let me know.)
+This is a practical summary, not legal advice. The authoritative terms are in the [GPL-3.0 licence](LICENSE).
