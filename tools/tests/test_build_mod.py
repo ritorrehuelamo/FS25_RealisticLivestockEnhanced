@@ -17,6 +17,20 @@ class BuildModTests(unittest.TestCase):
         self.assertEqual(build_mod.mod_version("1.0.0"), "1.0.0")
         self.assertEqual(build_mod.mod_version("1.2.3-rc.4"), "1.2.3-rc.4")
 
+    def test_release_candidate_archive_uses_the_calculated_release_version(self) -> None:
+        workflow = (
+            Path(__file__).resolve().parents[2]
+            / ".github"
+            / "workflows"
+            / "release-candidate.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            'VERSION: ${{ steps.version.outputs.version }}\n'
+            '        run: python tools/build_mod.py --version "$VERSION"',
+            workflow,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -53,8 +53,8 @@ jobs:
           echo "tag=v${VERSION}-rc.${sequence}" >> "$GITHUB_OUTPUT"
       - name: Build and validate mod archive
         env:
-          VERSION: ${{ steps.candidate.outputs.tag }}
-        run: python tools/build_mod.py --version "${VERSION#v}"
+          VERSION: ${{ steps.version.outputs.version }}
+        run: python tools/build_mod.py --version "$VERSION"
       - name: Render release notes from PR metadata
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
