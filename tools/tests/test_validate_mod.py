@@ -21,7 +21,7 @@ class ValidateModTests(unittest.TestCase):
             mod_desc.findtext("author"),
             "FS25 Realistic Livestock Enhanced contributors",
         )
-        self.assertEqual(mod_desc.findtext("version"), "1.0.0.0")
+        self.assertEqual(mod_desc.findtext("version"), "1.0.0")
         self.assertEqual(
             mod_desc.findtext("title/en"),
             "Realistic Livestock Enhanced",

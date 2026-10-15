@@ -13,9 +13,9 @@ class BuildModTests(unittest.TestCase):
         self.assertEqual(build_mod.ARCHIVE_FILENAME, "FS25_RealisticLivestockEnhanced.zip")
         self.assertNotIn("1.0.0", build_mod.ARCHIVE_FILENAME)
 
-    def test_technical_version_stays_inside_the_mod_metadata(self) -> None:
-        self.assertEqual(build_mod.technical_version("1.0.0"), "1.0.0.0")
-        self.assertEqual(build_mod.technical_version("1.2.3-rc.4"), "1.2.3.0-rc.4")
+    def test_mod_metadata_preserves_the_public_release_version(self) -> None:
+        self.assertEqual(build_mod.mod_version("1.0.0"), "1.0.0")
+        self.assertEqual(build_mod.mod_version("1.2.3-rc.4"), "1.2.3-rc.4")
 
 
 if __name__ == "__main__":
