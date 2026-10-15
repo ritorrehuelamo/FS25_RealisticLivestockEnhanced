@@ -3,7 +3,7 @@ name: Publish release candidate
 on:
   pull_request:
     branches: [main]
-    types: [labeled, synchronize, reopened]
+    types: [labeled, synchronize, reopened, edited]
 
 permissions:
   contents: write
