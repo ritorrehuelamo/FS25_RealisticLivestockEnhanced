@@ -60,6 +60,22 @@ def release_description_is_valid(body: str) -> bool:
     return True
 
 
+def manual_fs25_verification_is_valid(body: str) -> bool:
+    required_checks = (
+        "Clean test save loads the mod without errors.",
+        "Save and reload preserve the affected data.",
+        "A fresh log.txt has no new errors or stack traces from this mod.",
+    )
+    section = re.search(
+        r"^## Manual FS25 verification[ \t]*\r?$\n(?P<content>[\s\S]*?)(?=^## |\Z)",
+        body,
+        re.MULTILINE,
+    )
+    if section is None:
+        return False
+    return all(f"- [x] {check}" in section.group("content") for check in required_checks)
+
+
 def write_output(path: Path, values: dict[str, str]) -> None:
     with path.open("a", encoding="utf-8") as output:
         for key, value in values.items():
@@ -74,6 +90,7 @@ def main() -> None:
     parser.add_argument("--initial-version", default="1.0.0")
     parser.add_argument("--github-output", type=Path)
     parser.add_argument("--require-description", action="store_true")
+    parser.add_argument("--require-manual-fs25-verification", action="store_true")
     parser.add_argument("--validate-title", action="store_true")
     args = parser.parse_args()
 
@@ -82,6 +99,8 @@ def main() -> None:
         raise ValueError("initial version must be major.minor.patch")
     if args.require_description and not release_description_is_valid(args.body):
         raise ValueError("release PR description must include non-empty ## Summary and ## Validation sections")
+    if args.require_manual_fs25_verification and not manual_fs25_verification_is_valid(args.body):
+        raise ValueError("release PR description must include checked Manual FS25 verification items")
 
     if args.validate_title:
         if TITLE.fullmatch(args.title.strip()) is None:
