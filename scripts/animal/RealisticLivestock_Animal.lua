@@ -427,6 +427,16 @@ function Animal:setGenetics(genetics)
     self.genetics = genetics
 end
 
+function Animal:recordPedigree()
+    if g_server == nil or g_rlPedigreeRegistry == nil or self.birthday == nil then return false end
+    if self.uniqueId == nil or self.farmId == nil then return false end
+
+    return g_rlPedigreeRegistry:record({
+        id = self:getIdentifiers(), motherId = self.motherId, fatherId = self.fatherId,
+        typeIndex = self.animalTypeIndex,
+    })
+end
+
 function Animal:getGenetics()
     return self.genetics
 end
@@ -445,6 +455,7 @@ function Animal:setUniqueId(farmId)
 
         self.farmId = tostring(farmId)
         self.uniqueId = RLAnimalUtil.generateUniqueId(farmId, id)
+        self:recordPedigree()
 
         return
     end
@@ -476,6 +487,8 @@ function Animal:setUniqueId(farmId)
         self.farmId = tostring(farmHerdId)
         self.uniqueId = RLAnimalUtil.generateUniqueId(farmHerdId, id)
     end
+
+    self:recordPedigree()
 end
 
 -- Delegate (backward compatibility - remove in future cleanup)

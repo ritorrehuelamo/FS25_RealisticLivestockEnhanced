@@ -773,6 +773,24 @@ function RLSettings.loadDiseaseOverridesFromXMLFile()
 end
 
 
+--- Restore the append-only pedigree registry before live animals are reconciled.
+--- A missing subtree is a normal upgrade path: it leaves an empty registry which
+--- the AnimalSystem loader populates from every active animal and unborn child.
+function RLSettings.loadPedigreeFromXMLFile()
+
+	if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+	if g_server == nil then return end
+
+	g_rlPedigreeRegistry = RLPedigreeRegistry.new()
+	local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlSettings.xml"
+	local xmlFile = XMLFile.loadIfExists("rm_RlSettings", path)
+	if xmlFile == nil then return end
+
+	RLPedigreeSerialization.loadFromXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+	xmlFile:delete()
+end
+
+
 --- Write every setting state as rm_RlSettings child elements on an
 --- already-open XML document. The codec seam behind the disk wrapper
 --- (saveToXMLFile): takes the document as a dependency so the branches are
@@ -880,6 +898,12 @@ function RLSettings.saveToXMLFile(name, state)
 				RLDiseaseOverrideSerialization.saveToXMLFile(xmlFile, RLDiseaseOverrideSerialization.XML_BASE_KEY, g_rlDiseaseOverrideRegistry)
 			else
 				Log:warning("RLSettings.saveToXMLFile: g_rlDiseaseOverrideRegistry is nil; skipping disease override save (load-order regression?)")
+			end
+
+			if g_rlPedigreeRegistry ~= nil then
+				RLPedigreeSerialization.saveToXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+			else
+				Log:warning("RLSettings.saveToXMLFile: g_rlPedigreeRegistry is nil; skipping pedigree save")
 			end
 
 			local saved = xmlFile:save(false, true)

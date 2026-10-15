@@ -170,8 +170,9 @@ local function advancePregnancy(animal, spec, day, month, year, isSaleAnimal)
             animal.uniqueId or "?", fertility, childNum)
 
         if math.random() >= (2 - fertility) * 0.5 and childNum > 0 then
-            animal:createPregnancy(childNum, month, year)
-            Log:trace("  natural conception success")
+            if animal:createPregnancy(childNum, month, year) then
+                Log:trace("  natural conception success")
+            end
         end
     end
 
@@ -345,8 +346,6 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
 
     local fertility = animal.genetics.fertility
 
-    animal.isPregnant = true
-
     local fatherSubTypeIndex
 
     if father == nil then
@@ -366,6 +365,11 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
         for _, otherAnimal in pairs(animal.clusterSystem:getAnimals()) do
 
             if otherAnimal.gender ~= "male" or otherAnimal.isCastrated or otherAnimal.genetics.fertility <= 0 or otherAnimal:getIdentifiers() == animal.fatherId then continue end
+
+            if g_rlPedigreeRegistry ~= nil then
+                local decision = g_rlPedigreeRegistry:evaluate(animal:getIdentifiers(), otherAnimal:getIdentifiers(), RLPedigreeRegistry.POLICY.SAFE)
+                if not decision.allowed then continue end
+            end
 
             if otherAnimal.subType == "BULL_WATERBUFFALO" and animal.subType ~= "COW_WATERBUFFALO" then continue end
             if otherAnimal.subType == "RAM_GOAT" and animal.subType ~= "GOAT" then continue end
@@ -425,10 +429,13 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
                 tostring(father.metabolism), tostring(father.quality), tostring(father.health),
                 tostring(father.fertility), tostring(father.productivity))
         else
-            Log:trace("createPregnancy: no eligible father found, using defaults")
+            Log:trace("createPregnancy: no eligible unrelated father found")
+            return false
         end
 
     end
+
+    animal.isPregnant = true
 
     -- Coalesce productivity to 1.0 for paternal-snapshot field. genetics.productivity
     -- is nil for PIG and HORSE; without this both eligible-father selection and
@@ -655,6 +662,8 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
 
     g_server:broadcastEvent(AnimalPregnancyEvent.new(
         animal.clusterSystem ~= nil and animal.clusterSystem.owner or nil, animal))
+
+    return true
 
 end
 
@@ -1067,7 +1076,13 @@ function AnimalReproduction.getCanBeInseminatedByAnimal(animal, otherAnimal)
 
     if animal.isParent and animal.monthsSinceLastBirth <= 2 then return false, g_i18n:getText("rl_insemination_recovering") end
 
-    if string.format("%s %s %s", RLConstants.AREA_CODES[otherAnimal.country].code, otherAnimal.farmId, otherAnimal.uniqueId) == animal.fatherId then return false, g_i18n:getText("rl_insemination_father") end
+    local fatherId = string.format("%s %s %s", RLConstants.AREA_CODES[otherAnimal.country].code, otherAnimal.farmId, otherAnimal.uniqueId)
+    if fatherId == animal.fatherId then return false, g_i18n:getText("rl_insemination_father") end
+
+    if g_rlPedigreeRegistry ~= nil then
+        local decision = g_rlPedigreeRegistry:evaluate(animal:getIdentifiers(), fatherId, RLPedigreeRegistry.POLICY.SAFE)
+        if not decision.allowed then return false, g_i18n:getText("rl_insemination_father") end
+    end
 
     return true
 
