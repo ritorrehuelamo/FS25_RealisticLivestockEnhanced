@@ -170,8 +170,9 @@ local function advancePregnancy(animal, spec, day, month, year, isSaleAnimal)
             animal.uniqueId or "?", fertility, childNum)
 
         if math.random() >= (2 - fertility) * 0.5 and childNum > 0 then
-            animal:createPregnancy(childNum, month, year)
-            Log:trace("  natural conception success")
+            if animal:createPregnancy(childNum, month, year) then
+                Log:trace("  natural conception success")
+            end
         end
     end
 
@@ -345,8 +346,6 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
 
     local fertility = animal.genetics.fertility
 
-    animal.isPregnant = true
-
     local fatherSubTypeIndex
 
     if father == nil then
@@ -366,6 +365,11 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
         for _, otherAnimal in pairs(animal.clusterSystem:getAnimals()) do
 
             if otherAnimal.gender ~= "male" or otherAnimal.isCastrated or otherAnimal.genetics.fertility <= 0 or otherAnimal:getIdentifiers() == animal.fatherId then continue end
+
+            if g_rlPedigreeRegistry ~= nil then
+                local decision = g_rlPedigreeRegistry:evaluate(animal:getIdentifiers(), otherAnimal:getIdentifiers(), AnimalReproduction.getPedigreePolicy())
+                if not decision.allowed then continue end
+            end
 
             if otherAnimal.subType == "BULL_WATERBUFFALO" and animal.subType ~= "COW_WATERBUFFALO" then continue end
             if otherAnimal.subType == "RAM_GOAT" and animal.subType ~= "GOAT" then continue end
@@ -425,10 +429,13 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
                 tostring(father.metabolism), tostring(father.quality), tostring(father.health),
                 tostring(father.fertility), tostring(father.productivity))
         else
-            Log:trace("createPregnancy: no eligible father found, using defaults")
+            Log:trace("createPregnancy: no eligible unrelated father found")
+            return false
         end
 
     end
+
+    animal.isPregnant = true
 
     -- Coalesce productivity to 1.0 for paternal-snapshot field. genetics.productivity
     -- is nil for PIG and HORSE; without this both eligible-father selection and
@@ -656,6 +663,58 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
     g_server:broadcastEvent(AnimalPregnancyEvent.new(
         animal.clusterSystem ~= nil and animal.clusterSystem.owner or nil, animal))
 
+    return true
+
+end
+
+
+--- Resolve the saved relationship policy at the last responsible moment.
+--- @return string
+function AnimalReproduction.getPedigreePolicy()
+    if RLSettings ~= nil and RLSettings.getPedigreePolicy ~= nil then
+        return RLSettings.getPedigreePolicy()
+    end
+    return RLPedigreeRegistry.POLICY.SAFE
+end
+
+
+--- Build the durable registry identifier for an AI straw or a live animal.
+--- @param otherAnimal table
+--- @return string|nil
+function AnimalReproduction.getPedigreeIdentifier(otherAnimal)
+    if otherAnimal == nil then return nil end
+    if otherAnimal.getIdentifiers ~= nil then return otherAnimal:getIdentifiers() end
+
+    local country = otherAnimal.country
+    local area = country ~= nil and RLConstants.AREA_CODES[country] or nil
+    if area == nil or otherAnimal.farmId == nil or otherAnimal.uniqueId == nil then return nil end
+    return string.format("%s %s %s", area.code, otherAnimal.farmId, otherAnimal.uniqueId)
+end
+
+
+--- Evaluate one breeding pair. `warning` is deliberately returned separately:
+--- SAFE permits extended relations but the UI can make that choice visible.
+--- @param animal table
+--- @param otherAnimal table
+--- @return table|nil
+function AnimalReproduction.getPedigreeDecision(animal, otherAnimal)
+    if g_rlPedigreeRegistry == nil then return nil end
+
+    local firstId = animal and animal.getIdentifiers and animal:getIdentifiers() or nil
+    local secondId = AnimalReproduction.getPedigreeIdentifier(otherAnimal)
+    return g_rlPedigreeRegistry:evaluate(firstId, secondId, AnimalReproduction.getPedigreePolicy())
+end
+
+
+--- Translate a pedigree decision only at UI/event boundaries. The registry
+--- itself stays engine-independent for tests and save migration.
+---@param decision table|nil
+---@return string|nil
+function AnimalReproduction.getPedigreeDecisionText(decision)
+    if decision == nil then return nil end
+    if decision.reason ~= nil then return g_i18n:getText(decision.reason) end
+    if decision.warning then return g_i18n:getText("rl_pedigree_extended") end
+    return nil
 end
 
 
@@ -1067,9 +1126,15 @@ function AnimalReproduction.getCanBeInseminatedByAnimal(animal, otherAnimal)
 
     if animal.isParent and animal.monthsSinceLastBirth <= 2 then return false, g_i18n:getText("rl_insemination_recovering") end
 
-    if string.format("%s %s %s", RLConstants.AREA_CODES[otherAnimal.country].code, otherAnimal.farmId, otherAnimal.uniqueId) == animal.fatherId then return false, g_i18n:getText("rl_insemination_father") end
+    local fatherId = AnimalReproduction.getPedigreeIdentifier(otherAnimal)
+    if fatherId ~= nil and fatherId == animal.fatherId then return false, g_i18n:getText("rl_insemination_father") end
 
-    return true
+    local decision = AnimalReproduction.getPedigreeDecision(animal, otherAnimal)
+    if decision ~= nil and not decision.allowed then
+        return false, AnimalReproduction.getPedigreeDecisionText(decision)
+    end
+
+    return true, nil, AnimalReproduction.getPedigreeDecisionText(decision)
 
 end
 

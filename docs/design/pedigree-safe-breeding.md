@@ -50,11 +50,13 @@ returns a deterministic result:
 | `close` | grandparent/grandchild, aunt or uncle with niece or nephew | block |
 | `extended` | first cousins or another shared ancestor within the configured depth | warn |
 
-The default policy prevents direct and close pairings. Extended pairings are
-visible to the player but allowed. A setting may raise protection to block
-every detected relationship, or reduce it to preserve the legacy direct-only
-block. It must never turn unknown ancestry into a block: old saves and
-purchased animals frequently lack history.
+The default policy is **Safe**, preventing direct and close pairings while
+allowing an extended pairing with a clear warning. The server administrator can
+change **Breeding relationship policy** in the RL settings to **Direct
+relatives only** (legacy behaviour) or **Strict** (also blocks extended
+relationships). The setting is saved with the game and applies identically to
+manual AI, natural breeding, and Herdsman actions. It never turns unknown
+ancestry into a block: old saves and purchased animals frequently lack history.
 
 ## One authoritative gate
 
@@ -66,12 +68,19 @@ authoritative gate for:
 - natural pen breeding before a pregnancy is created;
 - Herdsman planning and execution, so an eligible-looking candidate cannot
   bypass the manual rule;
-- UI warnings and messages.
+- UI warnings and messages, including a final server-side validation when an
+  insemination event arrives.
 
 The server executes the decision. Clients receive the existing result/event
 flow and translated reason only; they do not author pedigree data.
 
 ## Migration and compatibility
+
+Pedigree history is stored in its own `rm_RlPedigree.xml` file. It is written
+only with the savegame, so changing a mod setting never rewrites the full
+historical registry. Early `1.1.0` release candidates used a
+`rm_RlSettings.pedigree` subtree; the loader reads that location only when the
+standalone file does not exist, then the next save writes `rm_RlPedigree.xml`.
 
 This is a forward-only, non-destructive save migration. Existing animals keep
 their current parent IDs. Missing parent IDs remain unknown; no guessed lineage

@@ -894,5 +894,6 @@
         <text name="rl_menu_filters_valueSet_title" text="Выбор значений"/>
         <text name="rl_menu_filters_valueSet_summary" text="Выбрано: %d"/>
         <text name="rl_menu_filters_valueSet_button" text="Редактировать значения..."/>
+        <text name="rl_settings_pedigreePolicy_label" text="Breeding relationship policy"/><text name="rl_settings_pedigreePolicy_tooltip" text="Controls which related animals are prevented from breeding."/><text name="rl_settings_pedigreePolicy_texts_1" text="Direct relatives only"/><text name="rl_settings_pedigreePolicy_texts_2" text="Safe: direct and close relatives"/><text name="rl_settings_pedigreePolicy_texts_3" text="Strict: also extended relatives"/><text name="rl_pedigree_direct" text="Breeding blocked: direct relationship detected."/><text name="rl_pedigree_close" text="Breeding blocked: close relationship detected."/><text name="rl_pedigree_extended" text="Pedigree warning: extended relationship detected."/>
     </texts>
 </l10n>

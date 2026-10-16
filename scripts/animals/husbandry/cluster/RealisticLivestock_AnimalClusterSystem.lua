@@ -161,6 +161,10 @@ function RealisticLivestock_AnimalClusterSystem:loadFromXMLFile(_, xmlFile, key)
         end
     end
 
+    if g_server ~= nil then
+        for _, animal in pairs(self.animals) do animal:recordPedigree() end
+    end
+
     self:updateClusters()
     self.needsUpdate = false
 
