@@ -31,3 +31,21 @@ local restored = RLPedigreeRegistry.new()
 assert(RLPedigreeSerialization.loadFromXMLFile(xml, baseKey, restored) == 3)
 assert(restored:relationship("dam", "calf") == "direct")
 assert(restored:get("calf").fatherId == "sire")
+
+local legacyXml = { values = {}, keys = {} }
+function legacyXml:setString(key, value) self.values[key] = value end
+function legacyXml:setInt(key, value) self.values[key] = value end
+function legacyXml:getString(key) return self.values[key] end
+function legacyXml:getInt(key) return self.values[key] end
+function legacyXml:iterate(_, callback)
+    for _, key in ipairs(self.keys) do callback(nil, key) end
+end
+
+local legacyBaseKey = RLPedigreeSerialization.LEGACY_XML_BASE_KEY
+assert(RLPedigreeSerialization.saveToXMLFile(legacyXml, legacyBaseKey, original) == 3)
+legacyXml.keys = {
+    legacyBaseKey .. ".record(0)", legacyBaseKey .. ".record(1)", legacyBaseKey .. ".record(2)",
+}
+local migrated = RLPedigreeRegistry.new()
+assert(RLPedigreeSerialization.loadFromXMLFile(legacyXml, legacyBaseKey, migrated) == 3)
+assert(migrated:relationship("dam", "calf") == "direct")

@@ -73,6 +73,12 @@ flow and translated reason only; they do not author pedigree data.
 
 ## Migration and compatibility
 
+Pedigree history is stored in its own `rm_RlPedigree.xml` file. It is written
+only with the savegame, so changing a mod setting never rewrites the full
+historical registry. Early `1.1.0` release candidates used a
+`rm_RlSettings.pedigree` subtree; the loader reads that location only when the
+standalone file does not exist, then the next save writes `rm_RlPedigree.xml`.
+
 This is a forward-only, non-destructive save migration. Existing animals keep
 their current parent IDs. Missing parent IDs remain unknown; no guessed lineage
 is generated and no existing pregnancy is cancelled. The registry is written

@@ -9,7 +9,8 @@
 local Log = RmLogging.getLogger("RLRM")
 
 RLPedigreeSerialization = {}
-RLPedigreeSerialization.XML_BASE_KEY = "rm_RlSettings.pedigree"
+RLPedigreeSerialization.XML_BASE_KEY = "rm_RlPedigree"
+RLPedigreeSerialization.LEGACY_XML_BASE_KEY = "rm_RlSettings.pedigree"
 
 local RECORD_VERSION = 1
 

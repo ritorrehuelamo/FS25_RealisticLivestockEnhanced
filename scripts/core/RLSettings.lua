@@ -774,19 +774,46 @@ end
 
 
 --- Restore the append-only pedigree registry before live animals are reconciled.
---- A missing subtree is a normal upgrade path: it leaves an empty registry which
---- the AnimalSystem loader populates from every active animal and unborn child.
+--- Its own file keeps this unbounded historical data out of settings writes.
+--- The former rm_RlSettings.pedigree subtree is a one-way migration source.
 function RLSettings.loadPedigreeFromXMLFile()
 
 	if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
 	if g_server == nil then return end
 
 	g_rlPedigreeRegistry = RLPedigreeRegistry.new()
-	local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlSettings.xml"
-	local xmlFile = XMLFile.loadIfExists("rm_RlSettings", path)
+	local savegameDir = g_currentMission.missionInfo.savegameDirectory
+	local xmlFile = XMLFile.loadIfExists("rm_RlPedigree", savegameDir .. "/rm_RlPedigree.xml")
+	if xmlFile ~= nil then
+		RLPedigreeSerialization.loadFromXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+		xmlFile:delete()
+		return
+	end
+
+	-- v1.1.0 RC migration: retain the previously-written registry until its
+	-- first standalone save creates rm_RlPedigree.xml.
+	xmlFile = XMLFile.loadIfExists("rm_RlSettings", savegameDir .. "/rm_RlSettings.xml")
+	if xmlFile == nil then return end
+	RLPedigreeSerialization.loadFromXMLFile(xmlFile, RLPedigreeSerialization.LEGACY_XML_BASE_KEY, g_rlPedigreeRegistry)
+	xmlFile:delete()
+end
+
+
+--- Persist the pedigree only during a savegame write, never when the player
+--- changes one mod setting. This keeps the growing historical registry out of
+--- the frequent rm_RlSettings.xml rewrite path.
+function RLSettings.savePedigreeToXMLFile()
+
+	if g_server == nil or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+	if g_rlPedigreeRegistry == nil then return end
+
+	local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlPedigree.xml"
+	local xmlFile = XMLFile.create("rm_RlPedigree", path, "rm_RlPedigree")
 	if xmlFile == nil then return end
 
-	RLPedigreeSerialization.loadFromXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+	xmlFile:setInt("rm_RlPedigree#version", 1)
+	RLPedigreeSerialization.saveToXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+	xmlFile:save(false, true)
 	xmlFile:delete()
 end
 
@@ -898,12 +925,6 @@ function RLSettings.saveToXMLFile(name, state)
 				RLDiseaseOverrideSerialization.saveToXMLFile(xmlFile, RLDiseaseOverrideSerialization.XML_BASE_KEY, g_rlDiseaseOverrideRegistry)
 			else
 				Log:warning("RLSettings.saveToXMLFile: g_rlDiseaseOverrideRegistry is nil; skipping disease override save (load-order regression?)")
-			end
-
-			if g_rlPedigreeRegistry ~= nil then
-				RLPedigreeSerialization.saveToXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
-			else
-				Log:warning("RLSettings.saveToXMLFile: g_rlPedigreeRegistry is nil; skipping pedigree save")
 			end
 
 			local saved = xmlFile:save(false, true)

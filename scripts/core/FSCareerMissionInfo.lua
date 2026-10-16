@@ -5,6 +5,7 @@ function RL_FSCareerMissionInfo:saveToXMLFile()
         -- AnimalSystem:saveToXMLFile now ignores path parameter and saves to rm_RlAnimalSystem.xml
         g_currentMission.animalSystem:saveToXMLFile(self.savegameDirectory .. "/rm_RlAnimalSystem.xml")
         RLSettings.saveToXMLFile()
+        RLSettings.savePedigreeToXMLFile()
     end
 end
 
