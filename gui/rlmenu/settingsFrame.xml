@@ -36,7 +36,7 @@
             <!-- ScrollingLayout uses fs25_settingsLayout. Rows render in
                  source order; per-section 20px GuiElement spacers act as
                  visual gaps without text headers. Order matches
-                 RLSettings.SETTINGS index 1..21. -->
+                 RLSettings.SETTINGS index 1..22. -->
             <ScrollingLayout profile="fs25_settingsLayout" id="generalSettingsLayout">
 
                 <!-- 1. Mortality -->
@@ -202,6 +202,15 @@
                         <Text profile="fs25_multiTextOptionTooltip" name="tooltip"/>
                     </Button>
                     <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_settings_maxVisualAnimals_label"/>
+                </Bitmap>
+
+                <!-- Pedigree policy is server-authoritative and applies to all
+                     breeding paths, including the Herdsman. -->
+                <Bitmap profile="fs25_multiTextOptionContainer" id="rlmenuSettingRow_pedigreePolicy">
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="rlmenuSetting_pedigreePolicy" onClick="onClickGeneralSetting">
+                        <Text profile="fs25_multiTextOptionTooltip" name="tooltip"/>
+                    </MultiTextOption>
+                    <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_settings_pedigreePolicy_label"/>
                 </Bitmap>
 
             </ScrollingLayout>

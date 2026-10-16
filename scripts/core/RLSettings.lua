@@ -394,6 +394,29 @@ RLSettings.SETTINGS = {
 		end
 	},
 
+	-- The pedigree evaluator reads the persisted policy at the breeding point,
+	-- rather than baking a single rule into every caller. State 2 preserves the
+	-- original module behaviour: direct and close relatives are rejected.
+	["pedigreePolicy"] = {
+		["index"] = 22,
+		["adminOnly"] = true,
+		["type"] = "MultiTextOption",
+		["default"] = 2,
+		["valueType"] = "string",
+		["values"] = {
+			RLPedigreeRegistry.POLICY.LEGACY_DIRECT,
+			RLPedigreeRegistry.POLICY.SAFE,
+			RLPedigreeRegistry.POLICY.STRICT,
+		},
+		["getTexts"] = function()
+			return {
+				g_i18n:getText("rl_settings_pedigreePolicy_texts_1"),
+				g_i18n:getText("rl_settings_pedigreePolicy_texts_2"),
+				g_i18n:getText("rl_settings_pedigreePolicy_texts_3"),
+			}
+		end
+	},
+
 	["useCustomAnimals"] = {
 		["index"] = 9,
 		["adminOnly"] = true,
@@ -519,6 +542,18 @@ RLSettings.SETTINGS = {
 	}
 
 }
+
+
+--- Return the active relationship policy without exposing the persisted state
+--- index to breeding code. A pre-settings load window remains safe by using
+--- the module's SAFE default.
+---@return string
+function RLSettings.getPedigreePolicy()
+	local setting = RLSettings.SETTINGS.pedigreePolicy
+	local state = setting and (setting.state or setting.default) or nil
+	local policy = setting and setting.values and setting.values[state] or nil
+	return policy or RLPedigreeRegistry.POLICY.SAFE
+end
 
 
 --- Read persisted setting states from an already-open settings XML document

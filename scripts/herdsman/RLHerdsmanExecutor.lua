@@ -835,6 +835,27 @@ function RLHerdsmanExecutor._doAi(action, ctx, placeable, farmId, count)
             return false, false, "bad-data"
         end
 
+        -- The plan may have been prepared before a setting change, an animal
+        -- transfer, or a pedigree update. Resolve the live animal and recheck
+        -- before dispatch; the event performs the same authoritative guard.
+        local liveAnimal = placeable:getClusterSystem() and RLAnimalUtil.find(
+            placeable:getClusterSystem().animals,
+            animal.farmId,
+            animal.uniqueId,
+            animal.country or (animal.birthday and animal.birthday.country))
+        if liveAnimal == nil then
+            Log:warning("%s rule=%s op=ai husbandry=%s farm=%s: animal[%d] no longer exists - skipped (no wage)",
+                LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), i)
+            return false, false, "not-in-husbandry"
+        end
+
+        local canInseminate, reason = liveAnimal:getCanBeInseminatedByAnimal(dewar.animal)
+        if not canInseminate then
+            Log:info("%s rule=%s op=ai husbandry=%s farm=%s: animal[%d] rejected by final breeding gate: %s",
+                LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), i, tostring(reason))
+            return false, false, "ineligible"
+        end
+
         items[i] = { animal = animal, dewar = dewar }
     end
 

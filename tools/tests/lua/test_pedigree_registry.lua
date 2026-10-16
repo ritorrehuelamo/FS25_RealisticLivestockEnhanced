@@ -31,6 +31,8 @@ local legacyClose = family:evaluate("mother", "niece", RLPedigreeRegistry.POLICY
 assert(legacyClose.allowed == true and legacyClose.warning == false)
 local strictCousins = family:evaluate("daughter", "niece", RLPedigreeRegistry.POLICY.STRICT)
 assert(strictCousins.allowed == false and strictCousins.relationship == "extended")
+local safeCousins = family:evaluate("daughter", "niece", RLPedigreeRegistry.POLICY.SAFE)
+assert(safeCousins.allowed == true and safeCousins.warning == true and safeCousins.reason == nil)
 
 local cycle = registry({
     { id = "cycleA", motherId = "cycleB", typeIndex = 1 },

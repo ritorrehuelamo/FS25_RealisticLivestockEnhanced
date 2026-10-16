@@ -471,6 +471,19 @@ function HandToolAIStraw:onInseminate()
 
 	local husbandry, animal = spec.targetedPlaceable, spec.targetedAnimal
 	Log:trace("onInseminate: animal=%s husbandry=%s isServer=%s", tostring(animal), tostring(husbandry), tostring(self.isServer))
+	local canInseminate, reason, warning = animal:getCanBeInseminatedByAnimal(spec.animal)
+	if not canInseminate then
+		-- Recheck at confirm time: the target or relationship policy may have
+		-- changed since the action prompt was displayed.
+		self:renderErrorText(reason)
+		return
+	end
+	if warning ~= nil then
+		Log:info("onInseminate: pedigree warning uniqueId=%s: %s", tostring(animal.uniqueId), tostring(warning))
+		if g_currentMission ~= nil then
+			g_currentMission:addIngameNotification(FSBaseMission.INGAME_NOTIFICATION_CRITICAL, warning)
+		end
+	end
 
 	animal:setInsemination(spec.animal)
 

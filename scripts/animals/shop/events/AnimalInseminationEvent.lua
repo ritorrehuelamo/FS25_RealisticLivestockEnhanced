@@ -117,7 +117,15 @@ function AnimalInseminationEvent:run(connection)
 				return
 			end
 
-			if animal.isInseminated then
+			local canInseminate, reason = animal:getCanBeInseminatedByAnimal(self.semen)
+			if not canInseminate then
+				-- The hand-tool UI checks this first, but the event can arrive late
+				-- or be crafted by a client. The server is therefore the final
+				-- authority for the current pedigree policy.
+				Log:info("InseminationEvent:run rejected uniqueId=%s reason=%s",
+					tostring(identifiers.uniqueId), tostring(reason))
+				return
+			elseif animal.isInseminated then
 				Log:debug("InseminationEvent:run skipping (already inseminated) uniqueId=%s",
 					tostring(identifiers.uniqueId))
 			else
