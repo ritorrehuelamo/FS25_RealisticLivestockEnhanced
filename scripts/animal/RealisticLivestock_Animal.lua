@@ -1385,12 +1385,22 @@ function Animal:onDiseaseTick(daysPerPeriod)
                 -- a cure below instead.
                 if treatmentResult == RLDiseaseRecord.TREATMENT_RESULT.FAILED
                     and disease.state == STATE.INFECTIOUS then
+                    if g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and self.uniqueId ~= nil then
+                        local day, month, year = RLCalendar.getDate(g_currentMission.environment)
+                        g_rlAnimalHistoryRegistry:recordHealthEvent(self:getIdentifiers(), disease.title, "treatment_failed",
+                            { day = day, month = month, year = year }, disease.immunityMonthsRemaining)
+                    end
                     self:addMessage("DISEASE_TREATMENT_FAILED", { disease.model.name })
 
                     Log:debug("onDiseaseTick: treatment course failed, DISEASE_TREATMENT_FAILED posted "
                         .. "(disease=%s farmId=%s uniqueId=%s)", tostring(disease.title),
                         tostring(self.farmId), tostring(self.uniqueId))
                 else
+                    if courseEnded and g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and self.uniqueId ~= nil then
+                        local day, month, year = RLCalendar.getDate(g_currentMission.environment)
+                        g_rlAnimalHistoryRegistry:recordHealthEvent(self:getIdentifiers(), disease.title, "treatment_completed",
+                            { day = day, month = month, year = year }, disease.immunityMonthsRemaining)
+                    end
                     Log:trace("onDiseaseTick: course ended, no failure post (result=%s state=%s disease=%s "
                         .. "farmId=%s uniqueId=%s)", tostring(treatmentResult), tostring(disease.state),
                         tostring(disease.title), tostring(self.farmId), tostring(self.uniqueId))
