@@ -955,5 +955,28 @@
         <text name="rl_pedigree_direct" text="Breeding blocked: direct relationship detected."/>
         <text name="rl_pedigree_close" text="Breeding blocked: close relationship detected."/>
         <text name="rl_pedigree_extended" text="Pedigree warning: extended relationship detected."/>
+        <text name="rl_settings_autoNameLivestock_label" text="Automatic livestock names"/>
+        <text name="rl_settings_autoNameLivestock_tooltip" text="Names unnamed livestock as breed plus its identifier. Manual names are kept."/>
+        <!-- Animal decision record -->
+        <text name="rl_decision_header" text="Selection record"/>
+        <text name="rl_decision_origin" text="Origin"/>
+        <text name="rl_decision_sale_value" text="Current sale value"/>
+        <text name="rl_decision_birth_genetics" text="Genetics at birth"/>
+        <text name="rl_decision_births" text="Births"/>
+        <text name="rl_decision_offspring" text="Offspring born"/>
+        <text name="rl_decision_last_birth" text="Last birth"/>
+        <text name="rl_decision_health_history" text="Health events"/>
+        <text name="rl_decision_origin_born" text="Born on farm"/>
+        <text name="rl_decision_origin_purchased" text="Purchased"/>
+        <text name="rl_decision_origin_unknown" text="Unknown"/>
+        <text name="rl_decision_not_recorded" text="Not recorded"/>
+        <text name="rl_decision_not_available" text="Not available"/>
+        <text name="rl_decision_observed" text="observed"/>
+        <text name="rl_decision_never" text="Never"/>
+        <text name="rl_decision_none" text="None"/>
+        <text name="rl_decision_traceability" text="Traceable ancestry"/>
+        <text name="rl_decision_reproduction" text="Reproduction"/>
+        <text name="rl_decision_reproduction_disabled" text="Steer — reproduction disabled"/>
+        <text name="rl_decision_latest_health" text="Latest health event"/>
     </texts>
 </l10n>

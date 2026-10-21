@@ -963,6 +963,10 @@ function AnimalReproduction.reproduce(animal, spec, day, month, year, isSaleAnim
 
     if deadChildrenCount > 0 and math.random() >= 0.35 + animal.genetics.health * 1.25 then parentDied = true end
 
+    if g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and animal.uniqueId ~= nil then
+        g_rlAnimalHistoryRegistry:recordBirth(animal:getIdentifiers(), #pregnancies, { day = day, month = month, year = year })
+    end
+
 
     table.sort(sellPrices, sortChildSellPrices)
 

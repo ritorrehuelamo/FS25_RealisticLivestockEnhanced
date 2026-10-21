@@ -107,6 +107,61 @@ local function buildDiseaseRows(animal)
     return rows
 end
 
+--- Combine durable decision facts with values that must remain live, notably sale price.
+local function buildDecisionRows(animal)
+    local history = nil
+    if g_rlAnimalHistoryRegistry ~= nil and animal.getIdentifiers ~= nil then history = g_rlAnimalHistoryRegistry:get(animal:getIdentifiers()) end
+    local sellValue = nil
+    if animal.getSellPrice ~= nil then
+        local ok, value = pcall(function() return animal:getSellPrice() end)
+        if ok and type(value) == "number" then sellValue = value end
+    end
+    local originKey = "rl_decision_origin_unknown"
+    if history ~= nil then originKey = "rl_decision_origin_" .. (history.origin or "unknown") end
+    local geneticsText = g_i18n:getText("rl_decision_not_recorded")
+    if history ~= nil and next(history.birthGenetics or {}) ~= nil then
+        local total, count = 0, 0
+        for _, value in pairs(history.birthGenetics) do total = total + value; count = count + 1 end
+        if count > 0 then geneticsText = string.format("%d%%", math.floor((total / count) * 100 + 0.5)) end
+        if history.snapshotKind == "observed" then geneticsText = geneticsText .. " (" .. g_i18n:getText("rl_decision_observed") .. ")" end
+    end
+    local lastBirth = g_i18n:getText("rl_decision_never")
+    if history ~= nil and history.lastBirth ~= nil then lastBirth = string.format("%d/%d/%d", history.lastBirth.day, history.lastBirth.month, history.lastBirth.year) end
+    local diseaseText = g_i18n:getText("rl_decision_none")
+    if history ~= nil and next(history.diseases or {}) ~= nil then
+        local count = 0; for _, value in pairs(history.diseases) do count = count + value end
+        diseaseText = string.format("%d", count)
+    end
+    local latestHealth = g_i18n:getText("rl_decision_none")
+    if history ~= nil and #(history.healthEvents or {}) > 0 then
+        local event = history.healthEvents[#history.healthEvents]
+        latestHealth = string.format("%s: %s", event.disease, event.outcome)
+        if event.immunityMonths ~= nil and event.immunityMonths > 0 then latestHealth = latestHealth .. string.format(" (%.1fm)", event.immunityMonths) end
+    end
+    local traceable, total = 0, 0
+    if g_currentMission ~= nil and g_currentMission.husbandrySystem ~= nil then
+        for _, pen in pairs(g_currentMission.husbandrySystem.placeables or {}) do
+            for _, candidate in pairs(pen:getClusters() or {}) do
+                if candidate.farmId == animal.farmId then
+                    total = total + 1
+                    if candidate.motherId ~= nil and candidate.fatherId ~= nil then traceable = traceable + 1 end
+                end
+            end
+        end
+    end
+    return {
+        { labelKey = "rl_decision_origin", valueKey = originKey },
+        { labelKey = "rl_decision_sale_value", valueText = sellValue and g_i18n:formatMoney(sellValue, 0, true, false) or g_i18n:getText("rl_decision_not_available") },
+        { labelKey = "rl_decision_birth_genetics", valueText = geneticsText },
+        { labelKey = "rl_decision_births", valueText = tostring(history and history.births or 0) },
+        { labelKey = "rl_decision_offspring", valueText = tostring(history and history.offspring or 0) },
+        { labelKey = "rl_decision_last_birth", valueText = lastBirth },
+        { labelKey = "rl_decision_health_history", valueText = diseaseText },
+        { labelKey = "rl_decision_traceability", valueText = string.format("%d/%d", traceable, total) },
+        { labelKey = "rl_decision_latest_health", valueText = latestHealth },
+    }
+end
+
 --- Build input rows for monitored animals.
 --- @param animal table
 --- @return table rows
@@ -415,6 +470,14 @@ function RLAnimalInfoService.getAnimalDisplay(animal, husbandry)
     if RLGeneticsFormatter ~= nil and RLGeneticsFormatter.format ~= nil then
         geneticsRows = RLGeneticsFormatter.format(animal.genetics, animal.animalTypeIndex, animal.subType)
     end
+    if animal.isCastrated then
+        for index, row in ipairs(geneticsRows) do
+            if row.labelKey == "rl_ui_fertility" then
+                geneticsRows[index] = { labelKey = "rl_decision_reproduction", valueText = g_i18n:getText("rl_decision_reproduction_disabled"), colorKey = "neutral" }
+                break
+            end
+        end
+    end
 
     local hasMonitor = animal.monitor ~= nil
         and (animal.monitor.active or animal.monitor.removed)
@@ -429,6 +492,7 @@ function RLAnimalInfoService.getAnimalDisplay(animal, husbandry)
         pedigreeFather       = buildParentRow("rl_ui_father", animal.fatherId),
         pedigreeChildren     = buildChildrenRow(animal),
         geneticsRows         = geneticsRows,
+        decisionRows         = buildDecisionRows(animal),
         hasMonitor           = hasMonitor,
         inputRows            = hasMonitor and buildInputRows(animal) or {},
         outputRows           = hasMonitor and buildOutputRows(animal) or {},

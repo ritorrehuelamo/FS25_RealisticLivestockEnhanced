@@ -417,6 +417,15 @@ RLSettings.SETTINGS = {
 		end
 	},
 
+	["autoNameLivestock"] = {
+		["index"] = 23,
+		["adminOnly"] = true,
+		["type"] = "BinaryOption",
+		["default"] = 1,
+		["binaryType"] = "offOn",
+		["values"] = { false, true }
+	},
+
 	["useCustomAnimals"] = {
 		["index"] = 9,
 		["adminOnly"] = true,
@@ -553,6 +562,11 @@ function RLSettings.getPedigreePolicy()
 	local state = setting and (setting.state or setting.default) or nil
 	local policy = setting and setting.values and setting.values[state] or nil
 	return policy or RLPedigreeRegistry.POLICY.SAFE
+end
+
+function RLSettings.getAutoNameLivestock()
+	local setting = RLSettings.SETTINGS.autoNameLivestock
+	return setting ~= nil and setting.values[setting.state or setting.default] == true
 end
 
 
@@ -850,6 +864,51 @@ function RLSettings.savePedigreeToXMLFile()
 	RLPedigreeSerialization.saveToXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
 	xmlFile:save(false, true)
 	xmlFile:delete()
+end
+
+--- Load the persisted fallback-ID repair audit before the startup repair pass.
+function RLSettings.loadAnimalIdMigrationAuditFromXMLFile()
+    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil or g_server == nil then return end
+    g_rlAnimalIdMigrationAudit = RLAnimalIdMigrationAudit.new()
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalIdMigration.xml"
+    local xmlFile = XMLFile.loadIfExists("rm_RlAnimalIdMigration", path)
+    if xmlFile == nil then return end
+    RLAnimalIdMigrationSerialization.loadFromXMLFile(xmlFile, RLAnimalIdMigrationSerialization.XML_BASE_KEY, g_rlAnimalIdMigrationAudit)
+    xmlFile:delete()
+end
+
+--- Save the last repair pass independently of frequent settings writes.
+function RLSettings.saveAnimalIdMigrationAuditToXMLFile()
+    if g_server == nil or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+    if g_rlAnimalIdMigrationAudit == nil then return end
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalIdMigration.xml"
+    local xmlFile = XMLFile.create("rm_RlAnimalIdMigration", path, "rm_RlAnimalIdMigration")
+    if xmlFile == nil then return end
+    RLAnimalIdMigrationSerialization.saveToXMLFile(xmlFile, RLAnimalIdMigrationSerialization.XML_BASE_KEY, g_rlAnimalIdMigrationAudit)
+    xmlFile:save(false, true); xmlFile:delete()
+end
+
+--- Restore the separate, append-only animal decision history before live animals are reconciled.
+function RLSettings.loadAnimalHistoryFromXMLFile()
+    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil or g_server == nil then return end
+    g_rlAnimalHistoryRegistry = RLAnimalHistoryRegistry.new()
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalHistory.xml"
+    local xmlFile = XMLFile.loadIfExists("rm_RlAnimalHistory", path)
+    if xmlFile == nil then return end
+    RLAnimalHistorySerialization.loadFromXMLFile(xmlFile, RLAnimalHistorySerialization.XML_BASE_KEY, g_rlAnimalHistoryRegistry)
+    xmlFile:delete()
+end
+
+--- Persist decision history only as part of a savegame write.
+function RLSettings.saveAnimalHistoryToXMLFile()
+    if g_server == nil or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+    if g_rlAnimalHistoryRegistry == nil then return end
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalHistory.xml"
+    local xmlFile = XMLFile.create("rm_RlAnimalHistory", path, "rm_RlAnimalHistory")
+    if xmlFile == nil then return end
+    xmlFile:setInt("rm_RlAnimalHistory#version", 1)
+    RLAnimalHistorySerialization.saveToXMLFile(xmlFile, RLAnimalHistorySerialization.XML_BASE_KEY, g_rlAnimalHistoryRegistry)
+    xmlFile:save(false, true); xmlFile:delete()
 end
 
 

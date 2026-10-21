@@ -107,6 +107,10 @@ source(modDirectory .. "scripts/animal/RLGenetics.lua")
 -- SECTION 11b2: Pedigree relationship engine. Pure Lua; persistence and callers follow later.
 source(modDirectory .. "scripts/animal/RLPedigreeRegistry.lua")
 source(modDirectory .. "scripts/animal/RLPedigreeSerialization.lua")
+source(modDirectory .. "scripts/animal/RLAnimalIdMigrationAudit.lua")
+source(modDirectory .. "scripts/animal/RLAnimalIdMigrationSerialization.lua")
+source(modDirectory .. "scripts/animal/RLAnimalHistoryRegistry.lua")
+source(modDirectory .. "scripts/animal/RLAnimalHistorySerialization.lua")
 
 -- SECTION 11c: Horse Logic (delegate module, sourced before Animal.lua)
 source(modDirectory .. "scripts/animal/AnimalHorse.lua")
