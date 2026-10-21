@@ -394,6 +394,29 @@ RLSettings.SETTINGS = {
 		end
 	},
 
+	-- The pedigree evaluator reads the persisted policy at the breeding point,
+	-- rather than baking a single rule into every caller. State 2 preserves the
+	-- original module behaviour: direct and close relatives are rejected.
+	["pedigreePolicy"] = {
+		["index"] = 22,
+		["adminOnly"] = true,
+		["type"] = "MultiTextOption",
+		["default"] = 2,
+		["valueType"] = "string",
+		["values"] = {
+			RLPedigreeRegistry.POLICY.LEGACY_DIRECT,
+			RLPedigreeRegistry.POLICY.SAFE,
+			RLPedigreeRegistry.POLICY.STRICT,
+		},
+		["getTexts"] = function()
+			return {
+				g_i18n:getText("rl_settings_pedigreePolicy_texts_1"),
+				g_i18n:getText("rl_settings_pedigreePolicy_texts_2"),
+				g_i18n:getText("rl_settings_pedigreePolicy_texts_3"),
+			}
+		end
+	},
+
 	["useCustomAnimals"] = {
 		["index"] = 9,
 		["adminOnly"] = true,
@@ -519,6 +542,18 @@ RLSettings.SETTINGS = {
 	}
 
 }
+
+
+--- Return the active relationship policy without exposing the persisted state
+--- index to breeding code. A pre-settings load window remains safe by using
+--- the module's SAFE default.
+---@return string
+function RLSettings.getPedigreePolicy()
+	local setting = RLSettings.SETTINGS.pedigreePolicy
+	local state = setting and (setting.state or setting.default) or nil
+	local policy = setting and setting.values and setting.values[state] or nil
+	return policy or RLPedigreeRegistry.POLICY.SAFE
+end
 
 
 --- Read persisted setting states from an already-open settings XML document
@@ -770,6 +805,51 @@ function RLSettings.loadDiseaseOverridesFromXMLFile()
 
 	Log:debug("RLSettings.loadDiseaseOverridesFromXMLFile: %d disease override(s) loaded%s", loaded,
 		loaded == 0 and " (no overrides)" or "")
+end
+
+
+--- Restore the append-only pedigree registry before live animals are reconciled.
+--- Its own file keeps this unbounded historical data out of settings writes.
+--- The former rm_RlSettings.pedigree subtree is a one-way migration source.
+function RLSettings.loadPedigreeFromXMLFile()
+
+	if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+	if g_server == nil then return end
+
+	g_rlPedigreeRegistry = RLPedigreeRegistry.new()
+	local savegameDir = g_currentMission.missionInfo.savegameDirectory
+	local xmlFile = XMLFile.loadIfExists("rm_RlPedigree", savegameDir .. "/rm_RlPedigree.xml")
+	if xmlFile ~= nil then
+		RLPedigreeSerialization.loadFromXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+		xmlFile:delete()
+		return
+	end
+
+	-- v1.1.0 RC migration: retain the previously-written registry until its
+	-- first standalone save creates rm_RlPedigree.xml.
+	xmlFile = XMLFile.loadIfExists("rm_RlSettings", savegameDir .. "/rm_RlSettings.xml")
+	if xmlFile == nil then return end
+	RLPedigreeSerialization.loadFromXMLFile(xmlFile, RLPedigreeSerialization.LEGACY_XML_BASE_KEY, g_rlPedigreeRegistry)
+	xmlFile:delete()
+end
+
+
+--- Persist the pedigree only during a savegame write, never when the player
+--- changes one mod setting. This keeps the growing historical registry out of
+--- the frequent rm_RlSettings.xml rewrite path.
+function RLSettings.savePedigreeToXMLFile()
+
+	if g_server == nil or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+	if g_rlPedigreeRegistry == nil then return end
+
+	local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlPedigree.xml"
+	local xmlFile = XMLFile.create("rm_RlPedigree", path, "rm_RlPedigree")
+	if xmlFile == nil then return end
+
+	xmlFile:setInt("rm_RlPedigree#version", 1)
+	RLPedigreeSerialization.saveToXMLFile(xmlFile, RLPedigreeSerialization.XML_BASE_KEY, g_rlPedigreeRegistry)
+	xmlFile:save(false, true)
+	xmlFile:delete()
 end
 
 

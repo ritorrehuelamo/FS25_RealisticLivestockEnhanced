@@ -946,5 +946,14 @@
         <text name="rl_menu_herdsman_default_name" text="New task"/>
         <text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
         <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
+        <!-- Pedigree safe-breeding controls -->
+        <text name="rl_settings_pedigreePolicy_label" text="Breeding relationship policy"/>
+        <text name="rl_settings_pedigreePolicy_tooltip" text="Controls which related animals are prevented from breeding. Applies to natural breeding, AI, and Herdsman tasks."/>
+        <text name="rl_settings_pedigreePolicy_texts_1" text="Direct relatives only"/>
+        <text name="rl_settings_pedigreePolicy_texts_2" text="Safe: direct and close relatives"/>
+        <text name="rl_settings_pedigreePolicy_texts_3" text="Strict: also extended relatives"/>
+        <text name="rl_pedigree_direct" text="Breeding blocked: direct relationship detected."/>
+        <text name="rl_pedigree_close" text="Breeding blocked: close relationship detected."/>
+        <text name="rl_pedigree_extended" text="Pedigree warning: extended relationship detected."/>
     </texts>
 </l10n>

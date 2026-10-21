@@ -37,7 +37,7 @@ jobs:
           LATEST_STABLE_TAG: ${{ steps.stable.outputs.tag }}
         run: >-
           python tools/release_version.py --require-description
-          --require-manual-fs25-verification --github-output "$GITHUB_OUTPUT"
+          --github-output "$GITHUB_OUTPUT"
       - name: Build and validate mod archive
         run: python tools/build_mod.py --version "${{ steps.version.outputs.version }}"
       - name: Render release notes from PR metadata

@@ -946,5 +946,14 @@
         <text name="rl_menu_filters_field_gender" text="Gender"/>
         <text name="rl_menu_filters_field_subType" text="Breed"/>
         <text name="rl_menu_filters_field_name" text="Name"/>
+        <!-- Controles de cría segura por pedigrí -->
+        <text name="rl_settings_pedigreePolicy_label" text="Política de parentesco para cría"/>
+        <text name="rl_settings_pedigreePolicy_tooltip" text="Controla qué animales emparentados no pueden criar. Se aplica a monta natural, IA y tareas de Herdsman."/>
+        <text name="rl_settings_pedigreePolicy_texts_1" text="Solo parentesco directo"/>
+        <text name="rl_settings_pedigreePolicy_texts_2" text="Segura: directo y cercano"/>
+        <text name="rl_settings_pedigreePolicy_texts_3" text="Estricta: también parentesco extendido"/>
+        <text name="rl_pedigree_direct" text="Cría bloqueada: se detectó parentesco directo."/>
+        <text name="rl_pedigree_close" text="Cría bloqueada: se detectó parentesco cercano."/>
+        <text name="rl_pedigree_extended" text="Aviso de pedigrí: se detectó parentesco extendido."/>
     </texts>
 </l10n>
