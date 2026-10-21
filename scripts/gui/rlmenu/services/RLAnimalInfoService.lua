@@ -132,6 +132,12 @@ local function buildDecisionRows(animal)
         local count = 0; for _, value in pairs(history.diseases) do count = count + value end
         diseaseText = string.format("%d", count)
     end
+    local latestHealth = g_i18n:getText("rl_decision_none")
+    if history ~= nil and #(history.healthEvents or {}) > 0 then
+        local event = history.healthEvents[#history.healthEvents]
+        latestHealth = string.format("%s: %s", event.disease, event.outcome)
+        if event.immunityMonths ~= nil and event.immunityMonths > 0 then latestHealth = latestHealth .. string.format(" (%.1fm)", event.immunityMonths) end
+    end
     local traceable, total = 0, 0
     if g_currentMission ~= nil and g_currentMission.husbandrySystem ~= nil then
         for _, pen in pairs(g_currentMission.husbandrySystem.placeables or {}) do
@@ -152,6 +158,7 @@ local function buildDecisionRows(animal)
         { labelKey = "rl_decision_last_birth", valueText = lastBirth },
         { labelKey = "rl_decision_health_history", valueText = diseaseText },
         { labelKey = "rl_decision_traceability", valueText = string.format("%d/%d", traceable, total) },
+        { labelKey = "rl_decision_latest_health", valueText = latestHealth },
     }
 end
 

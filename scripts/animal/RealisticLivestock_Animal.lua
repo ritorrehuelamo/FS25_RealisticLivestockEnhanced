@@ -1400,6 +1400,13 @@ function Animal:onDiseaseTick(daysPerPeriod)
             if disease.state ~= stateBefore then
                 flagOnce()
 
+                if g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and self.uniqueId ~= nil then
+                    local day, month, year = RLCalendar.getDate(g_currentMission.environment)
+                    local outcome = disease.state == STATE.RECOVERED and "recovered" or tostring(disease.state)
+                    g_rlAnimalHistoryRegistry:recordHealthEvent(self:getIdentifiers(), disease.title, outcome,
+                        { day = day, month = month, year = year }, disease.immunityMonthsRemaining)
+                end
+
                 Log:debug("onDiseaseTick: record moved %s -> %s (disease=%s farmId=%s uniqueId=%s)",
                     tostring(stateBefore), tostring(disease.state), tostring(disease.title),
                     tostring(self.farmId), tostring(self.uniqueId))
@@ -1910,6 +1917,9 @@ function Animal:addDisease(model, isCarrier, genes)
     table.insert(self.diseases, Disease.new(model, isCarrier, genes))
     if g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and self.uniqueId ~= nil then
         g_rlAnimalHistoryRegistry:recordDisease(self:getIdentifiers(), model.title or model.name)
+        local day, month, year = RLCalendar.getDate(g_currentMission.environment)
+        g_rlAnimalHistoryRegistry:recordHealthEvent(self:getIdentifiers(), model.title or model.name, "contracted",
+            { day = day, month = month, year = year })
     end
 end
 

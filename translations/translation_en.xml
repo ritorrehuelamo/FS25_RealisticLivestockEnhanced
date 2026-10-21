@@ -977,5 +977,6 @@
         <text name="rl_decision_traceability" text="Traceable ancestry"/>
         <text name="rl_decision_reproduction" text="Reproduction"/>
         <text name="rl_decision_reproduction_disabled" text="Steer — reproduction disabled"/>
+        <text name="rl_decision_latest_health" text="Latest health event"/>
     </texts>
 </l10n>

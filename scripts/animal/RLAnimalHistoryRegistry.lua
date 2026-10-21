@@ -20,6 +20,8 @@ local function copyRecord(record)
     for title, count in pairs(record.diseases or {}) do diseases[title] = count end
     local monthly = {}
     for index, snapshot in ipairs(record.monthly or {}) do monthly[index] = { month = snapshot.month, year = snapshot.year, weight = snapshot.weight, health = snapshot.health, sellValue = snapshot.sellValue, dailyGain = snapshot.dailyGain, foodLiters = snapshot.foodLiters } end
+    local healthEvents = {}
+    for index, event in ipairs(record.healthEvents or {}) do healthEvents[index] = { disease = event.disease, outcome = event.outcome, day = event.day, month = event.month, year = event.year, immunityMonths = event.immunityMonths } end
     return {
         id = record.id, origin = record.origin, snapshotKind = record.snapshotKind,
         birthGenetics = genetics, births = record.births or 0, offspring = record.offspring or 0,
@@ -27,6 +29,7 @@ local function copyRecord(record)
         death = record.death and { reason = record.death.reason, day = record.death.day, month = record.death.month, year = record.death.year } or nil,
         diseases = diseases,
         monthly = monthly,
+        healthEvents = healthEvents,
     }
 end
 
@@ -41,8 +44,15 @@ function RLAnimalHistoryRegistry:observe(record)
     if self.records[record.id] ~= nil then return false end
     self.records[record.id] = {
         id = record.id, origin = record.origin or "unknown", snapshotKind = record.snapshotKind or "observed",
-        birthGenetics = copyGenetics(record.birthGenetics), births = 0, offspring = 0, diseases = {}, monthly = {},
+        birthGenetics = copyGenetics(record.birthGenetics), births = 0, offspring = 0, diseases = {}, monthly = {}, healthEvents = {},
     }
+    return true
+end
+function RLAnimalHistoryRegistry:recordHealthEvent(id, disease, outcome, date, immunityMonths)
+    local record = self.records[id]
+    if record == nil or type(disease) ~= "string" or disease == "" then return false end
+    table.insert(record.healthEvents, { disease = disease, outcome = outcome or "observed", day = date and date.day, month = date and date.month, year = date and date.year, immunityMonths = immunityMonths })
+    while #record.healthEvents > 20 do table.remove(record.healthEvents, 1) end
     return true
 end
 function RLAnimalHistoryRegistry:recordMonthly(id, snapshot)

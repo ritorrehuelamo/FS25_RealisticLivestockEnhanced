@@ -27,6 +27,12 @@ function RLAnimalHistorySerialization.saveToXMLFile(xmlFile, baseKey, registry)
             if snapshot.dailyGain ~= nil then xmlFile:setFloat(monthlyKey .. "#dailyGain", snapshot.dailyGain) end
             if snapshot.foodLiters ~= nil then xmlFile:setFloat(monthlyKey .. "#foodLiters", snapshot.foodLiters) end
         end
+        for eventIndex, event in ipairs(record.healthEvents or {}) do
+            local eventKey = string.format("%s.healthEvent(%d)", key, eventIndex - 1)
+            xmlFile:setString(eventKey .. "#disease", event.disease); xmlFile:setString(eventKey .. "#outcome", event.outcome or "observed")
+            writeDate(xmlFile, eventKey, event)
+            if event.immunityMonths ~= nil then xmlFile:setInt(eventKey .. "#immunityMonths", event.immunityMonths) end
+        end
         local diseaseIndex = 0; for title, count in pairs(record.diseases or {}) do xmlFile:setString(string.format("%s.disease(%d)#title", key, diseaseIndex), title); xmlFile:setInt(string.format("%s.disease(%d)#count", key, diseaseIndex), count); diseaseIndex = diseaseIndex + 1 end
     end
     Log:debug("RLAnimalHistorySerialization: saved %d record(s)", #records); return #records
@@ -46,7 +52,12 @@ function RLAnimalHistorySerialization.loadFromXMLFile(xmlFile, baseKey, registry
         xmlFile:iterate(key .. ".monthly", function(_, monthlyKey)
             table.insert(record.monthly, { month = xmlFile:getInt(monthlyKey .. "#month"), year = xmlFile:getInt(monthlyKey .. "#year"), weight = xmlFile:getFloat(monthlyKey .. "#weight"), health = xmlFile:getFloat(monthlyKey .. "#health"), sellValue = xmlFile:getFloat(monthlyKey .. "#sellValue"), dailyGain = xmlFile:getFloat(monthlyKey .. "#dailyGain"), foodLiters = xmlFile:getFloat(monthlyKey .. "#foodLiters") })
         end)
-        if registry:observe(record) then local stored = registry.records[id]; stored.births = record.births; stored.offspring = record.offspring; stored.lastBirth = record.lastBirth; stored.death = record.death; stored.diseases = record.diseases; stored.monthly = record.monthly; loaded = loaded + 1 end
+        record.healthEvents = {}
+        xmlFile:iterate(key .. ".healthEvent", function(_, eventKey)
+            local disease = xmlFile:getString(eventKey .. "#disease")
+            if disease ~= nil then table.insert(record.healthEvents, { disease = disease, outcome = xmlFile:getString(eventKey .. "#outcome") or "observed", day = xmlFile:getInt(eventKey .. "#day"), month = xmlFile:getInt(eventKey .. "#month"), year = xmlFile:getInt(eventKey .. "#year"), immunityMonths = xmlFile:getInt(eventKey .. "#immunityMonths") }) end
+        end)
+        if registry:observe(record) then local stored = registry.records[id]; stored.births = record.births; stored.offspring = record.offspring; stored.lastBirth = record.lastBirth; stored.death = record.death; stored.diseases = record.diseases; stored.monthly = record.monthly; stored.healthEvents = record.healthEvents; loaded = loaded + 1 end
     end)
     Log:debug("RLAnimalHistorySerialization: loaded %d record(s)", loaded); return loaded
 end

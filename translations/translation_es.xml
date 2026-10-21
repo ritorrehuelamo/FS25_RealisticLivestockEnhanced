@@ -977,5 +977,6 @@
         <text name="rl_decision_traceability" text="Ascendencia verificable"/>
         <text name="rl_decision_reproduction" text="Reproducción"/>
         <text name="rl_decision_reproduction_disabled" text="Novillo — reproducción desactivada"/>
+        <text name="rl_decision_latest_health" text="Último evento sanitario"/>
     </texts>
 </l10n>

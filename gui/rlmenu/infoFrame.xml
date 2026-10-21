@@ -374,6 +374,7 @@
                         <GuiElement profile="rlMenu_infoRow" id="decisionRow[6]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[6]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[6]" position="155px 0px"/></GuiElement>
                         <GuiElement profile="rlMenu_infoRow" id="decisionRow[7]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[7]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[7]" position="155px 0px"/></GuiElement>
                         <GuiElement profile="rlMenu_infoRow" id="decisionRow[8]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[8]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[8]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[9]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[9]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[9]" position="155px 0px"/></GuiElement>
                     </BoxLayout>
 
                     <!-- ===== Disease section (hidden when no diseases) ===== -->
