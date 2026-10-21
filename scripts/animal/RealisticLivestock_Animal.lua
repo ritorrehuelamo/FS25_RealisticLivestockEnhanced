@@ -437,6 +437,17 @@ function Animal:recordPedigree()
     })
 end
 
+function Animal:applyAutomaticName()
+    if self:isHorse() or RLSettings == nil or not RLSettings.getAutoNameLivestock() then return false end
+    if self.name ~= nil and self.name ~= "" and self.name ~= "animal" then return false end
+    if self.uniqueId == nil then return false end
+    local subtype = self:getSubType()
+    local breed = (subtype and subtype.name) or self.subType or "Animal"
+    self.name = string.format("%s #%s", string.gsub(breed, "_", " "), tostring(self.uniqueId))
+    self:setDirty()
+    return true
+end
+
 --- Capture immutable decision facts once. Existing animals are marked as
 --- observed; newborns have parents and are therefore marked born on-farm.
 function Animal:recordDecisionHistory()
@@ -473,6 +484,7 @@ function Animal:setUniqueId(farmId)
 
         self.farmId = tostring(farmId)
         self.uniqueId = RLAnimalUtil.generateUniqueId(farmId, id)
+        self:applyAutomaticName()
         self:recordPedigree()
         self:recordDecisionHistory()
 
@@ -507,6 +519,7 @@ function Animal:setUniqueId(farmId)
         self.uniqueId = RLAnimalUtil.generateUniqueId(farmHerdId, id)
     end
 
+    self:applyAutomaticName()
     self:recordPedigree()
     self:recordDecisionHistory()
 end
@@ -1512,6 +1525,14 @@ function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPerio
     -- Death evaluation: low health -> old age -> random accidents (with AnimalDeathEvent broadcast)
     local lowHealthDeath, oldDeath, randomDeath, randomDeathMoney =
         AnimalHealth.evaluateDaily(self, spec)
+
+    if isServer and day == 1 and not isSaleAnimal and g_rlAnimalHistoryRegistry ~= nil and self.uniqueId ~= nil then
+        local sellValue = self:getSellPrice()
+        g_rlAnimalHistoryRegistry:recordMonthly(self:getIdentifiers(), {
+            month = month, year = year, days = daysPerPeriod, weight = self.weight, health = self.health,
+            sellValue = sellValue, foodLiters = (self.input.food or 0) * 24 * daysPerPeriod,
+        })
+    end
 
     return children, deadAnimals, childrenSold, childrenSoldAmount, lowHealthDeath, oldDeath, randomDeath,
         randomDeathMoney

@@ -36,7 +36,7 @@ RLDetailPaneHelper.NUM_CONDITION_ROWS = 5
 RLDetailPaneHelper.NUM_FOOD_ROWS      = 5
 RLDetailPaneHelper.NUM_STAT_ROWS      = 10
 RLDetailPaneHelper.NUM_GENETICS_ROWS  = 6
-RLDetailPaneHelper.NUM_DECISION_ROWS  = 7
+RLDetailPaneHelper.NUM_DECISION_ROWS  = 8
 RLDetailPaneHelper.NUM_DISEASE_ROWS   = 5
 RLDetailPaneHelper.NUM_INPUT_ROWS     = 3
 RLDetailPaneHelper.NUM_OUTPUT_ROWS    = 5
@@ -396,7 +396,7 @@ function RLDetailPaneHelper.updateAnimalDisplay(frame, animal, husbandry)
                     frame.geneticsLabel[index]:setText(g_i18n:getText(data.labelKey))
                 end
                 if frame.geneticsValue and frame.geneticsValue[index] then
-                    local bucketText = g_i18n:getText(data.valueKey)
+                    local bucketText = data.valueText or g_i18n:getText(data.valueKey)
                     local valueText
                     if data.numericValue ~= nil then
                         valueText = string.format("%d - %s", data.numericValue, bucketText)

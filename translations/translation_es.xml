@@ -955,6 +955,8 @@
         <text name="rl_pedigree_direct" text="Cría bloqueada: se detectó parentesco directo."/>
         <text name="rl_pedigree_close" text="Cría bloqueada: se detectó parentesco cercano."/>
         <text name="rl_pedigree_extended" text="Aviso de pedigrí: se detectó parentesco extendido."/>
+        <text name="rl_settings_autoNameLivestock_label" text="Nombres automáticos de ganado"/>
+        <text name="rl_settings_autoNameLivestock_tooltip" text="Nombra el ganado sin nombre como raza e identificador. Conserva los nombres manuales."/>
         <!-- Ficha de decisión del animal -->
         <text name="rl_decision_header" text="Ficha de selección"/>
         <text name="rl_decision_origin" text="Origen"/>
@@ -972,5 +974,8 @@
         <text name="rl_decision_observed" text="observada"/>
         <text name="rl_decision_never" text="Nunca"/>
         <text name="rl_decision_none" text="Ninguno"/>
+        <text name="rl_decision_traceability" text="Ascendencia verificable"/>
+        <text name="rl_decision_reproduction" text="Reproducción"/>
+        <text name="rl_decision_reproduction_disabled" text="Novillo — reproducción desactivada"/>
     </texts>
 </l10n>

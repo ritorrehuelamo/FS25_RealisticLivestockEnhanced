@@ -955,6 +955,8 @@
         <text name="rl_pedigree_direct" text="Breeding blocked: direct relationship detected."/>
         <text name="rl_pedigree_close" text="Breeding blocked: close relationship detected."/>
         <text name="rl_pedigree_extended" text="Pedigree warning: extended relationship detected."/>
+        <text name="rl_settings_autoNameLivestock_label" text="Automatic livestock names"/>
+        <text name="rl_settings_autoNameLivestock_tooltip" text="Names unnamed livestock as breed plus its identifier. Manual names are kept."/>
         <!-- Animal decision record -->
         <text name="rl_decision_header" text="Selection record"/>
         <text name="rl_decision_origin" text="Origin"/>
@@ -972,5 +974,8 @@
         <text name="rl_decision_observed" text="observed"/>
         <text name="rl_decision_never" text="Never"/>
         <text name="rl_decision_none" text="None"/>
+        <text name="rl_decision_traceability" text="Traceable ancestry"/>
+        <text name="rl_decision_reproduction" text="Reproduction"/>
+        <text name="rl_decision_reproduction_disabled" text="Steer — reproduction disabled"/>
     </texts>
 </l10n>

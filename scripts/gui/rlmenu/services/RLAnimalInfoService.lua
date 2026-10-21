@@ -132,6 +132,17 @@ local function buildDecisionRows(animal)
         local count = 0; for _, value in pairs(history.diseases) do count = count + value end
         diseaseText = string.format("%d", count)
     end
+    local traceable, total = 0, 0
+    if g_currentMission ~= nil and g_currentMission.husbandrySystem ~= nil then
+        for _, pen in pairs(g_currentMission.husbandrySystem.placeables or {}) do
+            for _, candidate in pairs(pen:getClusters() or {}) do
+                if candidate.farmId == animal.farmId then
+                    total = total + 1
+                    if candidate.motherId ~= nil and candidate.fatherId ~= nil then traceable = traceable + 1 end
+                end
+            end
+        end
+    end
     return {
         { labelKey = "rl_decision_origin", valueKey = originKey },
         { labelKey = "rl_decision_sale_value", valueText = sellValue and g_i18n:formatMoney(sellValue, 0, true, false) or g_i18n:getText("rl_decision_not_available") },
@@ -140,6 +151,7 @@ local function buildDecisionRows(animal)
         { labelKey = "rl_decision_offspring", valueText = tostring(history and history.offspring or 0) },
         { labelKey = "rl_decision_last_birth", valueText = lastBirth },
         { labelKey = "rl_decision_health_history", valueText = diseaseText },
+        { labelKey = "rl_decision_traceability", valueText = string.format("%d/%d", traceable, total) },
     }
 end
 
@@ -450,6 +462,14 @@ function RLAnimalInfoService.getAnimalDisplay(animal, husbandry)
     local geneticsRows = {}
     if RLGeneticsFormatter ~= nil and RLGeneticsFormatter.format ~= nil then
         geneticsRows = RLGeneticsFormatter.format(animal.genetics, animal.animalTypeIndex, animal.subType)
+    end
+    if animal.isCastrated then
+        for index, row in ipairs(geneticsRows) do
+            if row.labelKey == "rl_ui_fertility" then
+                geneticsRows[index] = { labelKey = "rl_decision_reproduction", valueText = g_i18n:getText("rl_decision_reproduction_disabled"), colorKey = "neutral" }
+                break
+            end
+        end
     end
 
     local hasMonitor = animal.monitor ~= nil

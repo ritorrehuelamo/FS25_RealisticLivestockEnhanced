@@ -417,6 +417,15 @@ RLSettings.SETTINGS = {
 		end
 	},
 
+	["autoNameLivestock"] = {
+		["index"] = 23,
+		["adminOnly"] = true,
+		["type"] = "BinaryOption",
+		["default"] = 1,
+		["binaryType"] = "offOn",
+		["values"] = { false, true }
+	},
+
 	["useCustomAnimals"] = {
 		["index"] = 9,
 		["adminOnly"] = true,
@@ -553,6 +562,11 @@ function RLSettings.getPedigreePolicy()
 	local state = setting and (setting.state or setting.default) or nil
 	local policy = setting and setting.values and setting.values[state] or nil
 	return policy or RLPedigreeRegistry.POLICY.SAFE
+end
+
+function RLSettings.getAutoNameLivestock()
+	local setting = RLSettings.SETTINGS.autoNameLivestock
+	return setting ~= nil and setting.values[setting.state or setting.default] == true
 end
 
 
