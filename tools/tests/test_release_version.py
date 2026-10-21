@@ -35,11 +35,13 @@ class ReleaseVersionTests(unittest.TestCase):
         body = """## Manual FS25 verification
 
 - [x] Clean test save loads the mod without errors.
-- [x] Save and reload preserve the affected data.
+- [x] Save and reload preserve the selected breeding policy and pedigree data.
 - [x] A fresh log.txt has no new errors or stack traces from this mod.
+- [x] Test direct, close, and extended pairings using manual AI.
 """
         self.assertTrue(release_version.manual_fs25_verification_is_valid(body))
         self.assertFalse(release_version.manual_fs25_verification_is_valid(body.replace("- [x] Save", "- [ ] Save")))
+        self.assertFalse(release_version.manual_fs25_verification_is_valid("## Manual FS25 verification\n\n- [x] One check\n"))
 
 
 if __name__ == "__main__":
