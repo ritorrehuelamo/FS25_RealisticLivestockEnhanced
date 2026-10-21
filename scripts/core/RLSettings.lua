@@ -852,6 +852,28 @@ function RLSettings.savePedigreeToXMLFile()
 	xmlFile:delete()
 end
 
+--- Load the persisted fallback-ID repair audit before the startup repair pass.
+function RLSettings.loadAnimalIdMigrationAuditFromXMLFile()
+    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil or g_server == nil then return end
+    g_rlAnimalIdMigrationAudit = RLAnimalIdMigrationAudit.new()
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalIdMigration.xml"
+    local xmlFile = XMLFile.loadIfExists("rm_RlAnimalIdMigration", path)
+    if xmlFile == nil then return end
+    RLAnimalIdMigrationSerialization.loadFromXMLFile(xmlFile, RLAnimalIdMigrationSerialization.XML_BASE_KEY, g_rlAnimalIdMigrationAudit)
+    xmlFile:delete()
+end
+
+--- Save the last repair pass independently of frequent settings writes.
+function RLSettings.saveAnimalIdMigrationAuditToXMLFile()
+    if g_server == nil or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+    if g_rlAnimalIdMigrationAudit == nil then return end
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalIdMigration.xml"
+    local xmlFile = XMLFile.create("rm_RlAnimalIdMigration", path, "rm_RlAnimalIdMigration")
+    if xmlFile == nil then return end
+    RLAnimalIdMigrationSerialization.saveToXMLFile(xmlFile, RLAnimalIdMigrationSerialization.XML_BASE_KEY, g_rlAnimalIdMigrationAudit)
+    xmlFile:save(false, true); xmlFile:delete()
+end
+
 
 --- Write every setting state as rm_RlSettings child elements on an
 --- already-open XML document. The codec seam behind the disk wrapper

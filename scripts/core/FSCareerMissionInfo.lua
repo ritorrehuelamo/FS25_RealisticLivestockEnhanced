@@ -6,6 +6,7 @@ function RL_FSCareerMissionInfo:saveToXMLFile()
         g_currentMission.animalSystem:saveToXMLFile(self.savegameDirectory .. "/rm_RlAnimalSystem.xml")
         RLSettings.saveToXMLFile()
         RLSettings.savePedigreeToXMLFile()
+        RLSettings.saveAnimalIdMigrationAuditToXMLFile()
     end
 end
 

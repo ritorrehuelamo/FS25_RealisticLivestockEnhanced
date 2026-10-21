@@ -271,20 +271,31 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     local temp = self.environment.weather.temperatureUpdater.currentMin or 20
 	local isServer = self:getIsServer()
     local fallbackRepairCount = 0
+    local repairsByPen = {}
+    if isServer and g_rlAnimalIdMigrationAudit ~= nil then g_rlAnimalIdMigrationAudit:beginRun() end
 
     for _, placeable in pairs(self.husbandrySystem.placeables) do
 
         local animals = placeable:getClusters()
+        local penName = placeable.getName ~= nil and placeable:getName() or tostring(placeable)
 
         for _, animal in pairs(animals) do
             -- Repair fallback ids from a load-order race: placeables load before
             -- FarmManager:loadFromXMLFile, so the farm lookup in Animal.new returns nil on a
             -- first-time install over an existing save. By onStartMission it resolves.
             if isServer and animal.uniqueId == "1" and animal.farmId == "1" then
+                local oldId = animal:getIdentifiers()
                 animal:setUniqueId()
-                Log:debug("Fallback ID repair: 1/1 -> %s/%s (subType=%s)",
-                    animal.farmId, animal.uniqueId, animal.subType or "?")
-                fallbackRepairCount = fallbackRepairCount + 1
+                local newId = animal:getIdentifiers()
+                if oldId == newId or (animal.uniqueId == "1" and animal.farmId == "1") then
+                    Log:error("Fallback ID repair failed: pen=%s id=%s", tostring(penName), oldId)
+                else
+                    animal:setDirty()
+                    Log:info("Fallback ID repair: pen=%s old=%s new=%s type=%s", tostring(penName), oldId, newId, animal.subType or "?")
+                    fallbackRepairCount = fallbackRepairCount + 1
+                    repairsByPen[penName] = (repairsByPen[penName] or 0) + 1
+                    if g_rlAnimalIdMigrationAudit ~= nil then g_rlAnimalIdMigrationAudit:record(penName, oldId, newId, animal.subType) end
+                end
             end
 
             animal:updateInput()
@@ -295,8 +306,16 @@ function RealisticLivestock_FSBaseMission:onStartMission()
 
     end
 
+    if isServer and g_rlAnimalIdMigrationAudit ~= nil then
+        for pen, count in pairs(repairsByPen) do Log:info("Fallback ID migration: pen=%s repaired=%d", tostring(pen), count) end
+        if g_rlAnimalIdMigrationAudit.previousRepairCount > 0 and fallbackRepairCount > 0 then
+            Log:error("Fallback ID migration stability check failed: previous startup repaired %d animal(s), current startup repaired %d", g_rlAnimalIdMigrationAudit.previousRepairCount, fallbackRepairCount)
+        elseif g_rlAnimalIdMigrationAudit.previousRepairCount > 0 then
+            Log:info("Fallback ID migration stability check passed: 0 repairs after previous migration of %d animal(s)", g_rlAnimalIdMigrationAudit.previousRepairCount)
+        end
+    end
     if fallbackRepairCount > 0 then
-        Log:info("onStartMission: repaired %d animal(s) with fallback IDs (load-order race)", fallbackRepairCount)
+        Log:warning("onStartMission: repaired %d animal(s) with fallback IDs; save and reload once to verify 0 repairs", fallbackRepairCount)
     end
 
     local guiOk, guiErr = pcall(function()

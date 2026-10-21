@@ -1135,6 +1135,7 @@ function AnimalSystem:loadFromXMLFile()
     RLSettings.loadDealerSaleFromXMLFile()
     RLSettings.loadDiseaseOverridesFromXMLFile()
     RLSettings.loadPedigreeFromXMLFile()
+    RLSettings.loadAnimalIdMigrationAuditFromXMLFile()
     RLDealerSaleApply.resetBaseline()
     RLDealerSaleApply.applyToLiveSubTypes()
 
