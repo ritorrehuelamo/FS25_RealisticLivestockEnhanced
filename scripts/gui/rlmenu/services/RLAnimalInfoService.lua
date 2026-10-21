@@ -107,6 +107,42 @@ local function buildDiseaseRows(animal)
     return rows
 end
 
+--- Combine durable decision facts with values that must remain live, notably sale price.
+local function buildDecisionRows(animal)
+    local history = nil
+    if g_rlAnimalHistoryRegistry ~= nil and animal.getIdentifiers ~= nil then history = g_rlAnimalHistoryRegistry:get(animal:getIdentifiers()) end
+    local sellValue = nil
+    if animal.getSellPrice ~= nil then
+        local ok, value = pcall(function() return animal:getSellPrice() end)
+        if ok and type(value) == "number" then sellValue = value end
+    end
+    local originKey = "rl_decision_origin_unknown"
+    if history ~= nil then originKey = "rl_decision_origin_" .. (history.origin or "unknown") end
+    local geneticsText = g_i18n:getText("rl_decision_not_recorded")
+    if history ~= nil and next(history.birthGenetics or {}) ~= nil then
+        local total, count = 0, 0
+        for _, value in pairs(history.birthGenetics) do total = total + value; count = count + 1 end
+        if count > 0 then geneticsText = string.format("%d%%", math.floor((total / count) * 100 + 0.5)) end
+        if history.snapshotKind == "observed" then geneticsText = geneticsText .. " (" .. g_i18n:getText("rl_decision_observed") .. ")" end
+    end
+    local lastBirth = g_i18n:getText("rl_decision_never")
+    if history ~= nil and history.lastBirth ~= nil then lastBirth = string.format("%d/%d/%d", history.lastBirth.day, history.lastBirth.month, history.lastBirth.year) end
+    local diseaseText = g_i18n:getText("rl_decision_none")
+    if history ~= nil and next(history.diseases or {}) ~= nil then
+        local count = 0; for _, value in pairs(history.diseases) do count = count + value end
+        diseaseText = string.format("%d", count)
+    end
+    return {
+        { labelKey = "rl_decision_origin", valueKey = originKey },
+        { labelKey = "rl_decision_sale_value", valueText = sellValue and g_i18n:formatMoney(sellValue, 0, true, false) or g_i18n:getText("rl_decision_not_available") },
+        { labelKey = "rl_decision_birth_genetics", valueText = geneticsText },
+        { labelKey = "rl_decision_births", valueText = tostring(history and history.births or 0) },
+        { labelKey = "rl_decision_offspring", valueText = tostring(history and history.offspring or 0) },
+        { labelKey = "rl_decision_last_birth", valueText = lastBirth },
+        { labelKey = "rl_decision_health_history", valueText = diseaseText },
+    }
+end
+
 --- Build input rows for monitored animals.
 --- @param animal table
 --- @return table rows
@@ -429,6 +465,7 @@ function RLAnimalInfoService.getAnimalDisplay(animal, husbandry)
         pedigreeFather       = buildParentRow("rl_ui_father", animal.fatherId),
         pedigreeChildren     = buildChildrenRow(animal),
         geneticsRows         = geneticsRows,
+        decisionRows         = buildDecisionRows(animal),
         hasMonitor           = hasMonitor,
         inputRows            = hasMonitor and buildInputRows(animal) or {},
         outputRows           = hasMonitor and buildOutputRows(animal) or {},

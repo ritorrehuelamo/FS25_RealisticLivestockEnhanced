@@ -437,6 +437,24 @@ function Animal:recordPedigree()
     })
 end
 
+--- Capture immutable decision facts once. Existing animals are marked as
+--- observed; newborns have parents and are therefore marked born on-farm.
+function Animal:recordDecisionHistory()
+    if g_server == nil or g_rlAnimalHistoryRegistry == nil or self.birthday == nil then return false end
+    if self.uniqueId == nil or self.farmId == nil then return false end
+    local origin = "unknown"
+    if self.motherId ~= nil or self.fatherId ~= nil then
+        origin = "born"
+    elseif self.sale ~= nil then
+        origin = "purchased"
+    end
+    return g_rlAnimalHistoryRegistry:observe({
+        id = self:getIdentifiers(), origin = origin,
+        snapshotKind = origin == "born" and "birth" or "observed",
+        birthGenetics = self.genetics,
+    })
+end
+
 function Animal:getGenetics()
     return self.genetics
 end
@@ -456,6 +474,7 @@ function Animal:setUniqueId(farmId)
         self.farmId = tostring(farmId)
         self.uniqueId = RLAnimalUtil.generateUniqueId(farmId, id)
         self:recordPedigree()
+        self:recordDecisionHistory()
 
         return
     end
@@ -489,6 +508,7 @@ function Animal:setUniqueId(farmId)
     end
 
     self:recordPedigree()
+    self:recordDecisionHistory()
 end
 
 -- Delegate (backward compatibility - remove in future cleanup)
@@ -1867,6 +1887,9 @@ function Animal:addDisease(model, isCarrier, genes)
         tostring(model.title), tostring(self.farmId), tostring(self.uniqueId))
 
     table.insert(self.diseases, Disease.new(model, isCarrier, genes))
+    if g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and self.uniqueId ~= nil then
+        g_rlAnimalHistoryRegistry:recordDisease(self:getIdentifiers(), model.title or model.name)
+    end
 end
 
 function Animal:getDisease(title)

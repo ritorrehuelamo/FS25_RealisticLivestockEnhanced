@@ -7,6 +7,7 @@ function RL_FSCareerMissionInfo:saveToXMLFile()
         RLSettings.saveToXMLFile()
         RLSettings.savePedigreeToXMLFile()
         RLSettings.saveAnimalIdMigrationAuditToXMLFile()
+        RLSettings.saveAnimalHistoryToXMLFile()
     end
 end
 
