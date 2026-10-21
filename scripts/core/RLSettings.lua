@@ -852,6 +852,29 @@ function RLSettings.savePedigreeToXMLFile()
 	xmlFile:delete()
 end
 
+--- Restore the separate, append-only animal decision history before live animals are reconciled.
+function RLSettings.loadAnimalHistoryFromXMLFile()
+    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil or g_server == nil then return end
+    g_rlAnimalHistoryRegistry = RLAnimalHistoryRegistry.new()
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalHistory.xml"
+    local xmlFile = XMLFile.loadIfExists("rm_RlAnimalHistory", path)
+    if xmlFile == nil then return end
+    RLAnimalHistorySerialization.loadFromXMLFile(xmlFile, RLAnimalHistorySerialization.XML_BASE_KEY, g_rlAnimalHistoryRegistry)
+    xmlFile:delete()
+end
+
+--- Persist decision history only as part of a savegame write.
+function RLSettings.saveAnimalHistoryToXMLFile()
+    if g_server == nil or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+    if g_rlAnimalHistoryRegistry == nil then return end
+    local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlAnimalHistory.xml"
+    local xmlFile = XMLFile.create("rm_RlAnimalHistory", path, "rm_RlAnimalHistory")
+    if xmlFile == nil then return end
+    xmlFile:setInt("rm_RlAnimalHistory#version", 1)
+    RLAnimalHistorySerialization.saveToXMLFile(xmlFile, RLAnimalHistorySerialization.XML_BASE_KEY, g_rlAnimalHistoryRegistry)
+    xmlFile:save(false, true); xmlFile:delete()
+end
+
 
 --- Write every setting state as rm_RlSettings child elements on an
 --- already-open XML document. The codec seam behind the disk wrapper

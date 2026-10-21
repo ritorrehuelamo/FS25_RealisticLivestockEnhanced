@@ -955,5 +955,22 @@
         <text name="rl_pedigree_direct" text="Cría bloqueada: se detectó parentesco directo."/>
         <text name="rl_pedigree_close" text="Cría bloqueada: se detectó parentesco cercano."/>
         <text name="rl_pedigree_extended" text="Aviso de pedigrí: se detectó parentesco extendido."/>
+        <!-- Ficha de decisión del animal -->
+        <text name="rl_decision_header" text="Ficha de selección"/>
+        <text name="rl_decision_origin" text="Origen"/>
+        <text name="rl_decision_sale_value" text="Valor de venta actual"/>
+        <text name="rl_decision_birth_genetics" text="Genética al nacer"/>
+        <text name="rl_decision_births" text="Partos"/>
+        <text name="rl_decision_offspring" text="Crías nacidas"/>
+        <text name="rl_decision_last_birth" text="Último parto"/>
+        <text name="rl_decision_health_history" text="Eventos de salud"/>
+        <text name="rl_decision_origin_born" text="Nacido en la granja"/>
+        <text name="rl_decision_origin_purchased" text="Comprado"/>
+        <text name="rl_decision_origin_unknown" text="Desconocido"/>
+        <text name="rl_decision_not_recorded" text="Sin registrar"/>
+        <text name="rl_decision_not_available" text="No disponible"/>
+        <text name="rl_decision_observed" text="observada"/>
+        <text name="rl_decision_never" text="Nunca"/>
+        <text name="rl_decision_none" text="Ninguno"/>
     </texts>
 </l10n>

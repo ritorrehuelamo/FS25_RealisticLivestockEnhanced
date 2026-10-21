@@ -363,6 +363,18 @@
 
                     </BoxLayout>
 
+                    <!-- ===== Selection record: durable history + live sale value ===== -->
+                    <BoxLayout profile="rlMenu_animalColumnLayout" id="decisionColumn">
+                        <Text profile="rlMenu_animalSectionHeader" text="$l10n_rl_decision_header"/>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[1]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[1]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[1]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[2]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[2]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[2]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[3]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[3]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[3]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[4]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[4]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[4]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[5]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[5]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[5]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[6]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[6]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[6]" position="155px 0px"/></GuiElement>
+                        <GuiElement profile="rlMenu_infoRow" id="decisionRow[7]"><Text profile="rlMenu_animalStatLabel" id="decisionLabel[7]"/><Text profile="rlMenu_animalStatValue" id="decisionValue[7]" position="155px 0px"/></GuiElement>
+                    </BoxLayout>
+
                     <!-- ===== Disease section (hidden when no diseases) ===== -->
                     <BoxLayout profile="rlMenu_animalColumnLayout" id="diseaseColumn">
                         <Text profile="rlMenu_animalSectionHeader" text="$l10n_rl_menu_info_diseases_header"/>

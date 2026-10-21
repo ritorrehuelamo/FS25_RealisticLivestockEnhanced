@@ -36,6 +36,7 @@ RLDetailPaneHelper.NUM_CONDITION_ROWS = 5
 RLDetailPaneHelper.NUM_FOOD_ROWS      = 5
 RLDetailPaneHelper.NUM_STAT_ROWS      = 10
 RLDetailPaneHelper.NUM_GENETICS_ROWS  = 6
+RLDetailPaneHelper.NUM_DECISION_ROWS  = 7
 RLDetailPaneHelper.NUM_DISEASE_ROWS   = 5
 RLDetailPaneHelper.NUM_INPUT_ROWS     = 3
 RLDetailPaneHelper.NUM_OUTPUT_ROWS    = 5
@@ -418,6 +419,19 @@ function RLDetailPaneHelper.updateAnimalDisplay(frame, animal, husbandry)
         end
     end
 
+    -- Selection facts: durable history plus the live sell value.
+    if frame.decisionRow ~= nil then
+        for index = 1, RLDetailPaneHelper.NUM_DECISION_ROWS do
+            local data = (display.decisionRows or {})[index]
+            local row = frame.decisionRow[index]
+            if row ~= nil then row:setVisible(data ~= nil) end
+            if data ~= nil then
+                if frame.decisionLabel and frame.decisionLabel[index] then frame.decisionLabel[index]:setText(g_i18n:getText(data.labelKey)) end
+                if frame.decisionValue and frame.decisionValue[index] then frame.decisionValue[index]:setText(data.valueText or g_i18n:getText(data.valueKey)) end
+            end
+        end
+    end
+
     -- Disease rows
     local hasDiseases = #display.diseaseRows > 0
     if frame.diseaseColumn ~= nil then
@@ -490,6 +504,7 @@ function RLDetailPaneHelper.updateAnimalDisplay(frame, animal, husbandry)
     if frame.geneticsColumn ~= nil and frame.geneticsColumn.invalidateLayout ~= nil then
         frame.geneticsColumn:invalidateLayout()
     end
+    if frame.decisionColumn ~= nil and frame.decisionColumn.invalidateLayout ~= nil then frame.decisionColumn:invalidateLayout() end
     if hasDiseases and frame.diseaseColumn ~= nil and frame.diseaseColumn.invalidateLayout ~= nil then
         frame.diseaseColumn:invalidateLayout()
     end

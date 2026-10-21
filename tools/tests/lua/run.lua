@@ -2,6 +2,7 @@ local testFiles = {
     "tools/tests/lua/test_breeding_math.lua",
     "tools/tests/lua/test_pedigree_registry.lua",
     "tools/tests/lua/test_pedigree_serialization.lua",
+    "tools/tests/lua/test_animal_history_registry.lua",
 }
 
 for _, path in ipairs(testFiles) do

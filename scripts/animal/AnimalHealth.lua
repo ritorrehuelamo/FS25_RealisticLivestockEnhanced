@@ -72,6 +72,10 @@ function AnimalHealth.die(animal, reason)
 
     Log:debug("Animal died: %s reason=%s", animal.uniqueId or "?", reason or "unknown")
 
+    if g_server ~= nil and g_rlAnimalHistoryRegistry ~= nil and animal.uniqueId ~= nil then
+        g_rlAnimalHistoryRegistry:recordDeath(animal:getIdentifiers(), reason, animal.birthday)
+    end
+
     if animal.sale ~= nil then g_currentMission.animalSystem:removeSaleAnimal(animal.animalTypeIndex, animal.birthday.country, animal.farmId, animal.uniqueId) end
     if animal.isAIAnimal then g_currentMission.animalSystem:removeAIAnimal(animal.animalTypeIndex, animal.birthday.country, animal.farmId, animal.uniqueId) end
 

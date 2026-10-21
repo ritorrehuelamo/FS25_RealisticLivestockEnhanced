@@ -1135,6 +1135,7 @@ function AnimalSystem:loadFromXMLFile()
     RLSettings.loadDealerSaleFromXMLFile()
     RLSettings.loadDiseaseOverridesFromXMLFile()
     RLSettings.loadPedigreeFromXMLFile()
+    RLSettings.loadAnimalHistoryFromXMLFile()
     RLDealerSaleApply.resetBaseline()
     RLDealerSaleApply.applyToLiveSubTypes()
 
@@ -1209,6 +1210,7 @@ function AnimalSystem:loadFromXMLFile()
 
             table.insert(self.animals[animalTypeIndex], animal)
             animal:recordPedigree()
+            animal:recordDecisionHistory()
         end
 
     end)
@@ -1233,6 +1235,7 @@ function AnimalSystem:loadFromXMLFile()
             local animalTypeIndex = animal.animalTypeIndex
             table.insert(self.aiAnimals[animalTypeIndex], animal)
             animal:recordPedigree()
+            animal:recordDecisionHistory()
 
         end
 
